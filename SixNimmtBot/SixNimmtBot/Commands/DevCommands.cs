@@ -20,7 +20,7 @@ namespace SixNimmtBot
         {
             if (msg.Date > DateTime.UtcNow.AddSeconds(-3))
             {
-                Process.Start(Path.Combine(@"C:\SixNimmt\", "Updater.exe"), msg.Chat.Id.ToString());
+                Process.Start(Path.Combine(@"C:\SixNimmtBot\", "Updater.exe"), msg.Chat.Id.ToString());
                 Program.MaintMode = true;
                 new Thread(CheckCurrentGames).Start();
             }
