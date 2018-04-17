@@ -740,7 +740,7 @@ namespace SixNimmtBot
             var buttons = new List<Tuple<string, string>>();
             foreach (SNCard card in cardList)
             {
-                buttons.Add(new Tuple<string, string>(card.GetName(), $"{this.Id}|{p.TelegramId}|card|{card.Number.ToString()}"));
+                buttons.Add(new Tuple<string, string>(card.GetName(), $"game|{this.Id}|{p.TelegramId}|card|{card.Number.ToString()}"));
             }
             var row = new List<InlineKeyboardButton>();
             var rows = new List<InlineKeyboardButton[]>();

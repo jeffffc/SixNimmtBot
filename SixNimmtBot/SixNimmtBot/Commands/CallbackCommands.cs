@@ -36,6 +36,22 @@ namespace SixNimmtBot
             }
         }
 
+        [Callback(Trigger = "update", DevOnly = true)]
+        public static void UpdateQuery(CallbackQuery query, string[] args)
+        {
+            var temp = args[1].Split('|');
+            var update = temp[0];
+            switch (update)
+            {
+                case "yes":
+                    Commands.Update(query.Message, args);
+                    break;
+                case "no":
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, "OK, I will do nothing.");
+                    break;
+            }
+        }
+
         [Callback(Trigger = "config")]
         public static void ConfigQuery(CallbackQuery query, string[] args)
         {
