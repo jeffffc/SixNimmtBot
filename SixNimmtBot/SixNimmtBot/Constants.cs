@@ -28,7 +28,7 @@ namespace SixNimmtBot
         {
             return (!temp) ? Path.GetFullPath(_languageDirectory) : Path.GetFullPath(_languageTempDirectory);
         }
-        public static long LogGroupId = -1001229839884;
+        public static long LogGroupId = -1001117997439;
         public static int[] Dev = new int[] { 106665913, 295152997 };
 
         #region GameConstants
