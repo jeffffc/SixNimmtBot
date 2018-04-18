@@ -44,7 +44,7 @@ namespace SixNimmtBot
             switch (update)
             {
                 case "yes":
-                    Bot.Api.EditMessageReplyMarkupAsync(query.Message.Chat.Id, query.Message.MessageId, null);
+                    Bot.Api.EditMessageReplyMarkupAsync(query.Message.Chat.Id, query.Message.MessageId, null).Wait();
                     Commands.Update(query.Message, args);
                     break;
                 case "no":
