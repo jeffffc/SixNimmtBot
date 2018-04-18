@@ -706,10 +706,11 @@ namespace SixNimmtBot
                 foreach (var p in Players)
                 {
                     var dbgp = db.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
-                    dbgp.Won = true;
                     dbgp.Bulls = p.FinalScore;
                     if (wonPlayers.Contains(p))
                         dbgp.Won = true;
+                    else
+                        dbgp.Won = false;
                     db.SaveChanges();
                 }
 
