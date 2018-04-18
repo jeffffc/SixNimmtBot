@@ -94,6 +94,18 @@ namespace SixNimmtBot
             return name.ToBold();
         }
 
+        public static string GetMention(this SNPlayer player)
+        {
+            var name = player.Name;
+            return $"<a href=\"tg://user?id={player.TelegramId}\">{name.FormatHTML()}</a>";
+        }
+
+        public static string GetMention(this User player)
+        {
+            var name = player.FirstName;
+            return $"<a href=\"tg://user?id={player.Id}\">{name.FormatHTML()}</a>";
+        }
+
         public static void GenerateCardsInHand(this SNPlayer p, SNDeck deck)
         {
             for (int i = 0; i < 9; i++)

@@ -105,20 +105,6 @@ namespace SixNimmtBot
             }
         }
 
-        [Command(Trigger = "seq")]
-        public static void GetSequence(Message msg, string[] args)
-        {
-            SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
-            if (game == null)
-            {
-                msg.Reply(GetTranslation("NoGame", GetLanguage(msg.Chat.Id)));
-            }
-            else
-            {
-               game.HandleMessage(msg);
-            }
-        }
-
         [Command(Trigger = "nextgame", GroupOnly = true)]
         public static void NextGame(Message msg, string[] args)
         {

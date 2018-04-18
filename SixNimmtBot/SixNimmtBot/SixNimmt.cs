@@ -40,6 +40,7 @@ namespace SixNimmtBot
         public string CurrentTableStickerId;
         public bool UseSticker = false;
         public Database.Game DbGame;
+        public int Round = 1;
         
 
         public Locale Locale;
@@ -402,7 +403,8 @@ namespace SixNimmtBot
 
         public string GetBullsTotalString(SNCard[] row)
         {
-            return $"{row.Where(x => x != null).Select(x => x.GetName().ToCode()).Aggregate((x, y) => x + " + " + y)}";
+            var sum = $"{row.Where(x => x != null).Select(x => x.Bulls).Sum()} 🐮";
+            return $"{row.Where(x => x != null).Select(x => x.GetName().ToCode()).Aggregate((x, y) => x + " + " + y)} = {sum}";
         }
 
         #endregion
@@ -419,13 +421,17 @@ namespace SixNimmtBot
 
                 if (Phase == GamePhase.Ending) return;
 
+                var firstMsg = GetTranslation("Round", Round).ToBold();
                 if (Players.All(x => x.CardsInHand.Count == 1))
                 {
-                    Send(GetTranslation("OneCardLeft"));
+                    firstMsg += Environment.NewLine + GetTranslation("OneCardLeft");
+                    Send(firstMsg);
                 }
                 else
                 {
-                    Send(GetTranslation("EveryoneChooseCard"));
+                    var playerMentions = Players.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
+                    firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard")}\n{playerMentions}";
+                    Send(firstMsg);
                     var currentSticker = GetTableCardsImage(TableCards);
                     foreach (var p in Players)
                     {
@@ -449,6 +455,14 @@ namespace SixNimmtBot
                         Thread.Sleep(1000);
                         if (Players.All(x => x.CurrentQuestion == null))
                             break;
+                        if (i == Constants.ChooseCardTime - 15)
+                        {
+                            // 15 secs left
+                            var playersHaveNotPlayed = Players.Where(x => x.CurrentQuestion != null)
+                                .Select(x => x.GetMention())
+                                .Aggregate((x, y) => x + ", " + y);
+                            Send($"{GetTranslation("ChooseCard15Secs")}\n{playersHaveNotPlayed}");
+                        }
                     }
                 }
 
@@ -475,7 +489,7 @@ namespace SixNimmtBot
                     }
                     else
                     {
-                        card = p.CardsInHand[Helpers.RandomNum(p.CardsInHand.Count)];
+                        card = p.CardsInHand.Random();
                     }
                     p.CardsInHand.Remove(card);
                     card.PlayedBy = p;
@@ -522,7 +536,7 @@ namespace SixNimmtBot
                         */
 
                         /* NEW: PLAYER CHOOSE WHICH ROW TO KEEP */
-                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetName())}");
+                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention())}");
                         SendMenu(card.PlayedBy,
                             GetTableCardsString() +
                             Environment.NewLine + Environment.NewLine +
@@ -543,7 +557,7 @@ namespace SixNimmtBot
                             card.PlayedBy.CurrentQuestion = null;
                         }
 
-                        var rowChosen = card.PlayedBy.Choice == -1 ? TableCards[RandomNum(TableCards.Count)] : TableCards[(int)card.PlayedBy.Choice];
+                        var rowChosen = card.PlayedBy.Choice == -1 ? TableCards.Random() : TableCards[(int)card.PlayedBy.Choice];
                         card.PlayedBy.KeptCards.AddRange(rowChosen);
                         msg = $"{GetTranslation("KeptRow", card.PlayedBy.GetName())}\n" + GetBullsTotalString(rowChosen);
                         Send(msg);
@@ -590,6 +604,7 @@ namespace SixNimmtBot
                     SortTableCards();
                     SendTableCards();
                     Thread.Sleep(5000);
+                    Round++;
                 }
                 CleanPlayers();
             }
