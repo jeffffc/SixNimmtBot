@@ -497,8 +497,7 @@ namespace SixNimmtBot
                 if (Players.Any(x => x.AFKTimes == 2))
                 {
                     Thread.Sleep(2000);
-                    var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention());
-                    Send(GetTranslation("AFK2Times") + Environment.NewLine + afkPlayers);
+                    var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                     Thread.Sleep(2000);
                 }
 
@@ -628,9 +627,9 @@ namespace SixNimmtBot
                     SortTableCards();
                     SendTableCards();
                     Thread.Sleep(5000);
-                    Round++;
                 }
                 CleanPlayers();
+                Round++;
             }
             catch (Exception ex)
             {
