@@ -708,8 +708,11 @@ namespace SixNimmtBot
                     var dbgp = DbGame.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
                     dbgp.Won = true;
                     dbgp.Bulls = p.FinalScore;
+                    db.SaveChanges();
                 }
-                DbGame.TimeEnded = DateTime.UtcNow;
+
+                var g = db.Games.FirstOrDefault(x => x.Id == GameId);
+                g.TimeEnded = DateTime.UtcNow;
                 db.SaveChanges();
 
                 foreach (var p in Players)
