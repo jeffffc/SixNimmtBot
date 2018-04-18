@@ -286,19 +286,18 @@ namespace SixNimmtBot
                     return;
                 }
                 var playerName = $"{player.GetName()} (<code>{playerId}</code>)";
-                var numOfAchvs = 0;
                 int numOfWins = db.GetNumOfWins(playerId).First().Value;
                 var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
                 var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
-                var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId), 
+                var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId),
                     playerName,
-                    numOfAchvs.ToBold(),
+                    achvCount.ToBold(),
                     numOfGames.ToBold(),
                     $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
-                    $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)})".ToBold(),
-                    numOfBulls
+                    $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)}%)".ToBold(),
+                    numOfBulls.ToBold()
                     );
-                    msg.Reply(send);
+                msg.Reply(send);
             }
         }
 
