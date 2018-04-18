@@ -697,8 +697,8 @@ namespace SixNimmtBot
                     Send(GetTranslation("PlayerBull", p.GetMention(), p.Score));
                 Thread.Sleep(3000);
             }
-            var wonPlayers = Players.Where(x => x.Score == finalPlayers.Last().Score);
-            Send($"{wonPlayers.Select(x => x.GetName()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
+            var wonPlayers = Players.Where(x => x.Score == finalPlayers.Last().Score).ToList();
+            Send($"{wonPlayers.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
 
             // DB
             using (var db = new SixNimmtDb())
@@ -712,6 +712,7 @@ namespace SixNimmtBot
                     else
                         dbgp.Won = false;
                     db.SaveChanges();
+                    Thread.Sleep(200);
                 }
 
                 var g = db.Games.FirstOrDefault(x => x.Id == GameId);
