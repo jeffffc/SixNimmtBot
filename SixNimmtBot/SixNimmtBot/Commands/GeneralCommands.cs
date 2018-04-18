@@ -274,30 +274,31 @@ namespace SixNimmtBot
         {
             using (var db = new SixNimmtDb())
             {
-            var isGroup = !(msg.Chat.Type == ChatType.Private);
-            var player = msg.ReplyToMessage?.From ?? msg.From;
-            var playerId = player.Id;
-            var achv = (Achievements)db.Players.FirstOrDefault(x => x.TelegramId == playerId).Achievements;
-            var achvCount = achv.GetUniqueFlags().Count();
+                var isGroup = !(msg.Chat.Type == ChatType.Private);
+                var player = msg.ReplyToMessage?.From ?? msg.From;
+                var playerId = player.Id;
+                var temp = db.Players.FirstOrDefault(x => x.TelegramId == playerId).Achievements ?? 0;
+                var achv = (Achievements)temp;
+                var achvCount = achv.GetUniqueFlags().Count();
                 if (!db.GamePlayers.Any(x => x.Player.TelegramId == playerId))
                 {
                     msg.Reply(GetTranslation("StatsHaveNotPlayed", GetLanguage(playerId)));
                     return;
                 }
-            var playerName = $"{player.GetName()} (<code>{playerId}</code>)";
-            var numOfAchvs = 0;
-            int numOfWins = db.GetNumOfWins(playerId).First().Value;
-            var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
-            var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
-            var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId), 
-                playerName,
-                numOfAchvs.ToBold(),
-                numOfGames.ToBold(),
-                $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
-                $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)})".ToBold(),
-                numOfBulls
-                );
-                msg.Reply(send);
+                var playerName = $"{player.GetName()} (<code>{playerId}</code>)";
+                var numOfAchvs = 0;
+                int numOfWins = db.GetNumOfWins(playerId).First().Value;
+                var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
+                var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
+                var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId), 
+                    playerName,
+                    numOfAchvs.ToBold(),
+                    numOfGames.ToBold(),
+                    $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
+                    $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)})".ToBold(),
+                    numOfBulls
+                    );
+                    msg.Reply(send);
             }
         }
 
