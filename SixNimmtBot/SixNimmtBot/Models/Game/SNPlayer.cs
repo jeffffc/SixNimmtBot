@@ -16,7 +16,10 @@ namespace SixNimmtBot.Models
         public List<SNCard> CardsInHand = new List<SNCard>();
         public List<SNCard> KeptCards = new List<SNCard>();
         public int? Choice { get; set; } = 0;
-        public bool UseSticker = false;
+        public bool UseSticker { get; set; } = false;
+        public int AFKTimes { get; set; } = 0;
+        public int AFKPenalties { get; set; } = 0;
+        public int FinalScore { get; set; } = 0;
 
         public QuestionAsked CurrentQuestion { get; set; } = null;
     }

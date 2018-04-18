@@ -489,7 +489,17 @@ namespace SixNimmtBot
                         p.Choice = 0;
                         Bot.Edit(p.TelegramId, p.CurrentQuestion.MessageId, GetTranslation("TimesUpButton"));
                         p.CurrentQuestion = null;
+                        p.AFKTimes++;
                     }
+                }
+
+                // announce AFK
+                if (Players.Any(x => x.AFKTimes == 2))
+                {
+                    Thread.Sleep(2000);
+                    var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention());
+                    Send(GetTranslation("AFK2Times") + Environment.NewLine + afkPlayers);
+                    Thread.Sleep(2000);
                 }
 
                 // move chosen card from hand to the pile
@@ -674,11 +684,16 @@ namespace SixNimmtBot
             {
                 var bullsCount = p.KeptCards.Count == 0 ? 0 : p.KeptCards.Where(x => x != null).Sum(x => x.Bulls);
                 p.Score = bullsCount;
+                p.AFKPenalties = Math.Max(p.AFKTimes - 2, 0) * 3;
+                p.FinalScore = p.Score + p.AFKPenalties;
             }
-            var finalPlayers = Players.OrderByDescending(x => x.Score);
+            var finalPlayers = Players.OrderByDescending(x => x.FinalScore);
             foreach (var p in finalPlayers)
             {
-                Send(GetTranslation("PlayerBull", p.GetName(), p.Score));
+                if (p.AFKPenalties > 0)
+                    Send(GetTranslation("PlayerBullWithAFK", p.GetMention(), p.AFKPenalties, p.Score, p.FinalScore));
+                else
+                    Send(GetTranslation("PlayerBull", p.GetMention(), p.Score));
                 Thread.Sleep(3000);
             }
             var wonPlayers = Players.Where(x => x.Score == finalPlayers.Last().Score);
