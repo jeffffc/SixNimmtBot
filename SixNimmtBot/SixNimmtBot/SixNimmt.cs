@@ -130,7 +130,7 @@ namespace SixNimmtBot
                 if (this.Phase == GamePhase.Ending)
                     return;
 
-                if (this.Players.Count() >= 3)
+                if (this.Players.Count() >= Constants.MinPlayer)
                     this.Phase = GamePhase.InGame;
                 if (this.Phase != GamePhase.InGame)
                 {
@@ -143,7 +143,7 @@ namespace SixNimmtBot
                 else
                 {
                     #region Ready to start game
-                    if (Players.Count < 3)
+                    if (Players.Count < Constants.MinPlayer)
                     {
                         Send(GetTranslation("GameEnded"));
                         return;
@@ -269,7 +269,7 @@ namespace SixNimmtBot
             }
             while (true);
 
-            Send(GetTranslation("JoinedGame", u.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, 3, 10));
+            Send(GetTranslation("JoinedGame", u.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
         }
 
         private void RemovePlayer(User user)
@@ -290,7 +290,7 @@ namespace SixNimmtBot
             }
             while (true);
 
-            Send(GetTranslation("FledGame", user.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, 3, 8));
+            Send(GetTranslation("FledGame", user.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
         }
 
         public void CleanPlayers()
@@ -669,9 +669,9 @@ namespace SixNimmtBot
             foreach (SNPlayer p in Players)
             {
 #if DEBUG
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < Constants.NumOfRounds; i++)
 #else
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < Constants.NumOfRounds; i++)
 #endif
                     p.CardsInHand.Add(CardDeck.Cards.Pop());
             }
@@ -703,11 +703,13 @@ namespace SixNimmtBot
             // DB
             using (var db = new SixNimmtDb())
             {
-                foreach (var p in wonPlayers)
+                foreach (var p in Players)
                 {
-                    var dbgp = DbGame.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
+                    var dbgp = db.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
                     dbgp.Won = true;
                     dbgp.Bulls = p.FinalScore;
+                    if (wonPlayers.Contains(p))
+                        dbgp.Won = true;
                     db.SaveChanges();
                 }
 
@@ -904,7 +906,7 @@ namespace SixNimmtBot
                         AddPlayer(msg.From);
                     break;
                 case "forcestart":
-                    if (this.Players.Count() >= 3) Phase = GamePhase.InGame;
+                    if (this.Players.Count() >= Constants.MinPlayer) Phase = GamePhase.InGame;
                     else
                     {
                         Send(GetTranslation("GameEnded"));

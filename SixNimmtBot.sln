@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SixNimmtBot", "SixNimmtBot\SixNimmtBot\SixNimmtBot.csproj", "{8E32ACB4-5B58-4C7F-A651-B15E680F2838}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SixNimmt", "SixNimmtBot", "{0514D2CB-AEC9-4765-852F-27D75E262A11}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SixNimmt", "SixNimmt", "{0514D2CB-AEC9-4765-852F-27D75E262A11}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "SixNimmtBot\Database\Database.csproj", "{BC6CBD8E-5C35-41C7-AA1A-EB6493AD9E67}"
 EndProject
@@ -17,8 +17,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Debug|Any CPU.ActiveCfg = Release|Any CPU
-		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E32ACB4-5B58-4C7F-A651-B15E680F2838}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC6CBD8E-5C35-41C7-AA1A-EB6493AD9E67}.Debug|Any CPU.ActiveCfg = Release|Any CPU

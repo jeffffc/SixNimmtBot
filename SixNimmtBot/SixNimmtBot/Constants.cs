@@ -34,15 +34,23 @@ namespace SixNimmtBot
         #region GameConstants
         public static int JoinTime = 120;
         public static int JoinTimeMax = 300;
+        public static int ExtendTime = 30;
 #if DEBUG
         public static int ChooseCardTime = 30;
 #else
         public static int ChooseCardTime = 45;
 #endif
-        public static int ExtendTime = 30;
-        public static int WitnessTime = 15;
 
-        #endregion
+#if DEBUG
+        public static int MinPlayer = 2;
+        public static int NumOfRounds = 3;
+#else
+        public static int MinPlayer = 3;
+        public static int NumOfRounds = 10;
+#endif
+        public static int MaxPlayer = 10;
+
+#endregion
 
         public static string DonationLiveToken = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\\SixNimmt").GetValue("DonationLiveToken").ToString();
         public static string DonationPayload = "CRIMINALDANCEBOTPAYLOAD:";

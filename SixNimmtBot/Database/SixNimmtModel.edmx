@@ -32,7 +32,7 @@ warning 6002: The table/view 'sixnimmt.dbo.Admin' does not have a primary key de
           <Property Name="PlayerId" Type="int" Nullable="false" />
           <Property Name="GameId" Type="int" Nullable="false" />
           <Property Name="Won" Type="bit" />
-          <Property Name="Bulls" Type="int" />
+          <Property Name="Bulls" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -160,7 +160,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="GameId" Type="Int32" Nullable="false" />
           <Property Name="Won" Type="Boolean" />
           <NavigationProperty Name="Player" Relationship="Self.FK_GamePlayer_Player" FromRole="GamePlayer" ToRole="Player" />
-          <Property Name="Bulls" Type="Int32" />
+          <Property Name="Bulls" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Game" Relationship="sixnimmtModel.FK_GamePlayer_Game" FromRole="GamePlayer" ToRole="Game" />
         </EntityType>
         <EntityType Name="Group">
@@ -246,7 +246,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Parameter Name="playerId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="GetPlayerNumOfBulls" ReturnType="Collection(Int32)">
-            <Parameter Name="playerId" Mode="In" Type="Int32" />
+          <Parameter Name="playerId" Mode="In" Type="Int32" />
           </FunctionImport>
         </EntityContainer>
         <EntityType Name="Game">
