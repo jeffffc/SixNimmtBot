@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SixNimmtBot.Models
+namespace SixNimmtBot.Models.General
 {
     public class Locale
     {

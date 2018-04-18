@@ -7,7 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using System.Runtime.Caching;
 using SixNimmtBot.Handlers;
-using SixNimmtBot.Models;
+using SixNimmtBot.Models.General;
 using System.Threading;
 using ConsoleTables;
 using System.Xml.Linq;
@@ -51,7 +51,7 @@ namespace SixNimmtBot
                     if (a is Attributes.Command cmd)
                     {
                         var method = m.CreateDelegate(typeof(Bot.CommandMethod)) as Bot.CommandMethod;
-                        Bot.Commands.Add(new Models.Command(cmd.Trigger, cmd.AdminOnly, cmd.DevOnly, cmd.GroupOnly, method));
+                        Bot.Commands.Add(new Command(cmd.Trigger, cmd.AdminOnly, cmd.DevOnly, cmd.GroupOnly, method));
                     }
                 }
             }
@@ -63,7 +63,7 @@ namespace SixNimmtBot
                     if (a is Attributes.Callback cb)
                     {
                         var method = m.CreateDelegate(typeof(Bot.CallbackMethod)) as Bot.CallbackMethod;
-                        Bot.Callbacks.Add(new Models.Callback(cb.Trigger, cb.AdminOnly, cb.DevOnly, method));
+                        Bot.Callbacks.Add(new Callback(cb.Trigger, cb.AdminOnly, cb.DevOnly, method));
                     }
                 }
             }

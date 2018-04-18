@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 using SixNimmtBot.Models;
+using SixNimmtBot.Models.General;
 using SixNimmtBot;
 using System.Threading;
 using Database;
@@ -710,6 +711,41 @@ namespace SixNimmtBot
                 }
                 DbGame.TimeEnded = DateTime.UtcNow;
                 db.SaveChanges();
+
+                foreach (var p in Players)
+                {
+                    Achievements newAchv = Achievements.None;
+                    var dbp = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId);
+                    if (dbp.Achievements == null)
+                        dbp.Achievements = 0;
+                    var achv = (Achievements)dbp.Achievements;
+
+                    // check achv criteria
+                    if (!achv.HasFlag(Achievements.Newbie)) // must get play one game achv
+                        newAchv = newAchv | Achievements.Newbie;
+                    if (!achv.HasFlag(Achievements.SixNimmt) && p.SixNimmt == true) // take a full row
+                        newAchv = newAchv | Achievements.SixNimmt;
+                    if (!achv.HasFlag(Achievements.Addicted) && db.GetPlayerNumOfGames(p.TelegramId).First().Value >= 100) // play 100 games
+                        newAchv = newAchv | Achievements.Addicted;
+                    if (!achv.HasFlag(Achievements.Professional) && db.GetNumOfWins(p.TelegramId).First().Value >= 100) // win 100 games
+                        newAchv = newAchv | Achievements.Professional;
+                    if (!achv.HasFlag(Achievements.ThirtySixNimmt) && p.FinalScore >= 36) // get > 36 bulls
+                        newAchv = newAchv | Achievements.ThirtySixNimmt;
+                    if (!achv.HasFlag(Achievements.ZeroNimmt) && p.FinalScore == 0) // took no cards/bulls
+                        newAchv = newAchv | Achievements.ZeroNimmt;
+
+
+                    // now save
+                    dbp.Achievements = (long)(achv | newAchv);
+                    db.SaveChanges();
+
+                    //notify
+                    var newFlags = newAchv.GetUniqueFlags().ToList();
+                    if (newAchv == Achievements.None) continue;
+                    var achvMsg = GetTranslation("NewUnlocks").ToBold() + Environment.NewLine + Environment.NewLine;
+                    achvMsg = newFlags.Aggregate(achvMsg, (current, a) => current + $"{a.GetAchvName(Language).ToBold()}\n{a.GetAchvDescription(Language)}\n\n");
+                    SendPM(p, achvMsg);
+                }
             }
         }
 

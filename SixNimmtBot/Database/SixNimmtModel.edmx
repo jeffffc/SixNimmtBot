@@ -109,6 +109,15 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="GetNumOfWins" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="playerId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetPlayerNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="playerId" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetPlayerNumOfGames" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="playerId" Type="int" Mode="In" />
+        </Function>
         <EntityContainer Name="sixnimmtModelStoreContainer">
           <EntitySet Name="Game" EntityType="Self.Game" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="GamePlayer" EntityType="Self.GamePlayer" Schema="dbo" store:Type="Tables" />
@@ -230,6 +239,15 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
             <End Role="Game" EntitySet="Games" />
             <End Role="GamePlayer" EntitySet="GamePlayers" />
           </AssociationSet>
+          <FunctionImport Name="GetNumOfWins" ReturnType="Collection(Int32)">
+          <Parameter Name="playerId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="GetPlayerNumOfGames" ReturnType="Collection(Int32)">
+          <Parameter Name="playerId" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="GetPlayerNumOfBulls" ReturnType="Collection(Int32)">
+            <Parameter Name="playerId" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="Game">
           <Key>
@@ -343,6 +361,9 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetNumOfWins" FunctionName="sixnimmtModel.Store.GetNumOfWins" />
+          <FunctionImportMapping FunctionImportName="GetPlayerNumOfGames" FunctionName="sixnimmtModel.Store.GetPlayerNumOfGames" />
+          <FunctionImportMapping FunctionImportName="GetPlayerNumOfBulls" FunctionName="sixnimmtModel.Store.GetPlayerNumOfBulls" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

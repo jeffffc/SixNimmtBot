@@ -1,6 +1,7 @@
 ﻿using Database;
 using SixNimmtBot.Attributes;
 using SixNimmtBot.Handlers;
+using SixNimmtBot.Models.General;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,17 @@ namespace SixNimmtBot
 {
     public partial class Commands
     {
-        [Command(Trigger = "ping")]
+        [Attributes.Command(Trigger = "start")]
+        public static void Start(Message msg, string[] args)
+        {
+            if (msg.Chat.Type != ChatType.Private) return;
+            if (args.Length == 0)
+            {
+                msg.Reply("Thank you for starting me. This bot is still in BETA phase. Use /config to change the language and display of table cards.");
+            }
+        }
+
+        [Attributes.Command(Trigger = "ping")]
         public static void Ping(Message msg, string[] args)
         {
             var now = DateTime.UtcNow;
@@ -27,7 +38,7 @@ namespace SixNimmtBot
 
         }
 
-        [Command(Trigger = "lang", DevOnly = true)]
+        [Attributes.Command(Trigger = "lang", DevOnly = true)]
         public static void ChangeLang(Message msg, string[] args)
         {
             if (args == null)
@@ -49,7 +60,7 @@ namespace SixNimmtBot
             catch { }
         }
 
-        [Command(Trigger = "grouplang", DevOnly = true)]
+        [Attributes.Command(Trigger = "grouplang", DevOnly = true)]
         public static void ChangeGroupLang(Message msg, string[] args)
         {
             if (args == null)
@@ -71,7 +82,7 @@ namespace SixNimmtBot
             catch { }
         }
 
-        [Command(Trigger = "config", AdminOnly = true)]
+        [Attributes.Command(Trigger = "config", AdminOnly = true)]
         public static void Config(Message msg, string[] args)
         {
             var id = msg.Chat.Id;
@@ -110,7 +121,7 @@ namespace SixNimmtBot
             Bot.Send(msg.From.Id, GetTranslation("WhatToDo", GetLanguage(msg.Chat.Id)), replyMarkup: menu);
         }
 
-        [Command(Trigger = "setlang")]
+        [Attributes.Command(Trigger = "setlang")]
         public static void SetLang(Message msg, string[] args)
         {
             var id = msg.From.Id;
@@ -134,14 +145,14 @@ namespace SixNimmtBot
             Bot.Send(msg.From.Id, GetTranslation("ChoosePMLanguage", GetLanguage(msg.From.Id)), replyMarkup: menu);
         }
 
-        [Command(Trigger = "maintenance", DevOnly = true)]
+        [Attributes.Command(Trigger = "maintenance", DevOnly = true)]
         public static void Maintenance(Message msg, string[] args)
         {
             Program.MaintMode = !Program.MaintMode;
             Bot.Send(msg.Chat.Id, $"Maintenance Mode: {Program.MaintMode}");
         }
 
-        [Command(Trigger = "getlang")]
+        [Attributes.Command(Trigger = "getlang")]
         public static void GetLang(Message msg, string[] args)
         {
             if (!Constants.Dev.Contains(msg.From.Id) && msg.Chat.Type != ChatType.Private) return;
@@ -149,7 +160,7 @@ namespace SixNimmtBot
             Bot.Send(msg.Chat.Id, GetTranslation("GetWhichLang", GetLanguage(msg.Chat.Id)), Handler.GetGetLangMenu());
         }
 
-        [Command(Trigger = "reloadlangs", DevOnly = true)]
+        [Attributes.Command(Trigger = "reloadlangs", DevOnly = true)]
         public static void ReloadLang(Message msg, string[] args)
         {
             Program.English = Helpers.ReadEnglish();
@@ -157,7 +168,7 @@ namespace SixNimmtBot
             msg.Reply("Done.");
         }
 
-        [Command(Trigger = "uploadlang", DevOnly = true)]
+        [Attributes.Command(Trigger = "uploadlang", DevOnly = true)]
         public static void UploadLang(Message msg, string[] args)
         {
             try
@@ -180,7 +191,7 @@ namespace SixNimmtBot
             }
         }
 
-        [Command(Trigger = "rules")]
+        [Attributes.Command(Trigger = "rules")]
         public static void Rules(Message msg, string[] args)
         {
             try
@@ -199,7 +210,7 @@ namespace SixNimmtBot
             }
         }
 
-        [Command(Trigger = "donate")]
+        [Attributes.Command(Trigger = "donate")]
         public static void Donate(Message msg, string[] args)
         {
             if (msg.Chat.Type != ChatType.Private)
@@ -249,7 +260,7 @@ namespace SixNimmtBot
 
         }
 
-        [Command(Trigger = "runinfo")]
+        [Attributes.Command(Trigger = "runinfo")]
         public static void RunInfo(Message msg, string[] args)
         {
             string uptime = $"{(DateTime.Now - Program.Startup):dd\\.hh\\:mm\\:ss\\.ff}";
@@ -258,5 +269,55 @@ namespace SixNimmtBot
             Bot.Send(msg.Chat.Id, GetTranslation("Runinfo", GetLanguage(msg.Chat.Id), uptime, gamecount, playercount));
         }
 
+        [Attributes.Command(Trigger = "stats")]
+        public static void Stats(Message msg, string[] args)
+        {
+            using (var db = new SixNimmtDb())
+            {
+            var isGroup = !(msg.Chat.Type == ChatType.Private);
+            var player = msg.ReplyToMessage?.From ?? msg.From;
+            var playerId = player.Id;
+            var achv = (Achievements)db.Players.FirstOrDefault(x => x.TelegramId == playerId).Achievements;
+            var achvCount = achv.GetUniqueFlags().Count();
+                if (!db.GamePlayers.Any(x => x.Player.TelegramId == playerId))
+                {
+                    msg.Reply(GetTranslation("StatsHaveNotPlayed", GetLanguage(playerId)));
+                    return;
+                }
+            var playerName = $"{player.GetName()} (<code>{playerId}</code>)";
+            var numOfAchvs = 0;
+            int numOfWins = db.GetNumOfWins(playerId).First().Value;
+            var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
+            var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
+            var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId), 
+                playerName,
+                numOfAchvs.ToBold(),
+                numOfGames.ToBold(),
+                $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
+                $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)})".ToBold(),
+                numOfBulls
+                );
+                msg.Reply(send);
+            }
+        }
+
+        [Attributes.Command(Trigger = "achievements")]
+        public static void Achievements(Message msg, string[] args)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                var p = db.Players.FirstOrDefault(x => x.TelegramId == msg.From.Id);
+                var temp = p.Achievements ?? 0;
+                var achv = (Achievements)temp;
+                var lang = GetLanguage(msg.From.Id);
+                var achvList = achv.GetUniqueFlags().ToList();
+                var msg1 = $"{GetTranslation("AchievementsGot", lang, achvList.Count)}\n\n";
+                msg1 = achvList.Aggregate(msg1, (current, a) => current + $"{a.GetAchvName(lang).ToBold()}\n{a.GetAchvDescription(lang)}\n\n");
+                var noAchvList = achv.GetUniqueFlags(true).ToList();
+                var msg2 = $"{GetTranslation("AchievementsLack", lang, noAchvList.Count)}\n\n";
+                msg2 = noAchvList.Aggregate(msg2, (current, a) => current + $"{a.GetAchvName(lang).ToBold()}\n{a.GetAchvDescription(lang)}\n\n");
+                msg.ReplyPM(new[] { msg1, msg2 });
+            }
+        }
     }
 }

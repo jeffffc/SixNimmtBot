@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SixNimmtBot.Models
+namespace SixNimmtBot.Models.General
 {
     class Callback
     {

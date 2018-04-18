@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SixNimmtBot.Models
+namespace SixNimmtBot.Models.General
 {
     class Command
     {

@@ -14,7 +14,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SixNimmtBot.Models
+namespace SixNimmtBot.Models.General
 {
     public class CustomConsoleTable
     {
@@ -206,20 +206,20 @@ namespace SixNimmtBot.Models
             return columnLengths;
         }
 
-        public void Write(Format format = SixNimmtBot.Models.Format.Default)
+        public void Write(Format format = Models.General.Format.Default)
         {
             switch (format)
             {
-                case SixNimmtBot.Models.Format.Default:
+                case Models.General.Format.Default:
                     Console.WriteLine(ToString());
                     break;
-                case SixNimmtBot.Models.Format.MarkDown:
+                case Models.General.Format.MarkDown:
                     Console.WriteLine(ToMarkDownString());
                     break;
-                case SixNimmtBot.Models.Format.Alternative:
+                case Models.General.Format.Alternative:
                     Console.WriteLine(ToStringAlternative());
                     break;
-                case SixNimmtBot.Models.Format.Minimal:
+                case Models.General.Format.Minimal:
                     Console.WriteLine(ToMinimalString());
                     break;
                 default:

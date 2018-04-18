@@ -21,6 +21,9 @@ namespace SixNimmtBot.Models
         public int AFKPenalties { get; set; } = 0;
         public int FinalScore { get; set; } = 0;
 
+        // achv
+        public bool SixNimmt { get; set; } = false;
+
         public QuestionAsked CurrentQuestion { get; set; } = null;
     }
 

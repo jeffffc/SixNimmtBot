@@ -78,6 +78,7 @@
     <Compile Include="Handlers\MainHandler.cs" />
     <Compile Include="Handlers\MessageHandler.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="Models\General\Achievements.cs" />
     <Compile Include="Models\General\Callback.cs" />
     <Compile Include="Models\General\Commands.cs" />
     <Compile Include="Extensions.cs" />

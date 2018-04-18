@@ -1,4 +1,4 @@
-﻿using SixNimmtBot.Models;
+﻿using SixNimmtBot.Models.General;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +18,8 @@ namespace SixNimmtBot
         public static ITelegramBotClient Api;
         public static User Me;
 
-        internal static HashSet<Models.Command> Commands = new HashSet<Models.Command>();
-        internal static HashSet<Models.Callback> Callbacks = new HashSet<Models.Callback>();
+        internal static HashSet<Models.General.Command> Commands = new HashSet<Models.General.Command>();
+        internal static HashSet<Models.General.Callback> Callbacks = new HashSet<Models.General.Callback>();
         public delegate void CommandMethod(Message msg, string[] args);
         public delegate void CallbackMethod(CallbackQuery query, string[] args);
 
@@ -187,6 +187,12 @@ namespace SixNimmtBot
                 e.LogError();
                 return null;
             }
+        }
+
+        public static void ReplyPM(this Message m, string[] texts, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
+        {
+            foreach (var text in texts)
+                m.ReplyPM(text, replyMarkup, parseMode, disableWebPagePreview, disableNotification);
         }
 
         public static Message ReplyPM(this Message m, string text, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
