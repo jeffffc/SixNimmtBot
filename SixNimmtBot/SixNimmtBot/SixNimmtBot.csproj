@@ -81,6 +81,7 @@
     <Compile Include="Models\General\Callback.cs" />
     <Compile Include="Models\General\Commands.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Models\General\CustomConsoleTable.cs" />
     <Compile Include="Models\General\GroupAdmin.cs" />
     <Compile Include="Models\General\Locale.cs" />
     <Compile Include="Models\Game\SNCard.cs" />

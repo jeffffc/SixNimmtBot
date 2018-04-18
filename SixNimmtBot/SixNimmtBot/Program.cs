@@ -113,12 +113,12 @@ namespace SixNimmtBot
                 msg += Environment.NewLine + $"Number of Games: {gameCount.ToString()}";
                 Console.WriteLine(msg);
 
-                var table = new ConsoleTable("Game GUID", "ChatId", "Phase", "# of Players");
+                var table = new ConsoleTables.ConsoleTable("Game GUID", "ChatId", "Phase", "# of Players");
                 foreach (SixNimmt game in games)
                 {
                     table.AddRow(game.Id.ToString(), game.ChatId.ToString(), game.Phase.ToString(), game.Players.Count().ToString());
                 }
-                table.Write(Format.Alternative);
+                table.Write(ConsoleTables.Format.Alternative);
 
                 Thread.Sleep(2000);
             }

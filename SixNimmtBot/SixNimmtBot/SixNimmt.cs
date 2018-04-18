@@ -14,7 +14,6 @@ using System.IO;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using System.Xml.Linq;
 using static SixNimmtBot.Helpers;
-using ConsoleTables;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -36,7 +35,6 @@ namespace SixNimmtBot
         public int JoinTime = Constants.JoinTime;
         public GamePhase Phase = GamePhase.Joining;
         private int _secondsToAdd = 0;
-        private int _playerList = 0;
         public string CurrentTableStickerId;
         public bool UseSticker = false;
         public Database.Game DbGame;
@@ -373,7 +371,7 @@ namespace SixNimmtBot
 
         public string TextToTable(List<SNCard[]> cards)
         {
-            var table = new ConsoleTable("C 1", "C 2", "C 3", "C 4", "C 5");
+            var table = new CustomConsoleTable("C 1", "C 2", "C 3", "C 4", "C 5");
             foreach (var row in cards)
             {
                 var tx = row.Select(x => x == null ? " " : x.Number.ToString().PadLeft(3, ' ')).ToList();
@@ -407,6 +405,7 @@ namespace SixNimmtBot
                 var items = list.Skip(i).Take(2).ToList();
                 msg += items.Select(x => x.GetName().PadRight(13)).Aggregate((x, y) => x + " " + y) + Environment.NewLine;
             }
+            msg += $"{GetTranslation("Total")}{cards.Select(x => x.Bulls).Sum()}";
             return msg.ToCode();
         }
 
@@ -521,7 +520,7 @@ namespace SixNimmtBot
                 }
 
                 Send($"{GetTranslation("CardsPlayed")}\n{tempPile.Select(x => x.Number.ToString()).Aggregate((x, y) => x + " " + y)}");
-                Thread.Sleep(4000);
+                Thread.Sleep(6000);
 
                 int row1Diff = 0;
                 int row2Diff = 0;
@@ -581,12 +580,13 @@ namespace SixNimmtBot
                         }
 
                         var rowChosen = card.PlayedBy.Choice == -1 ? TableCards.Random() : TableCards[(int)card.PlayedBy.Choice];
-                        card.PlayedBy.KeptCards.AddRange(rowChosen);
+                        card.PlayedBy.KeptCards.AddRange(rowChosen.Where(x => x != null));
                         msg = $"{GetTranslation("KeptRow", card.PlayedBy.GetName())}\n" + GetBullsTotalString(rowChosen);
                         Send(msg);
                         Array.Clear(rowChosen, 0, rowChosen.Length);
                         rowChosen[0] = card;
                         card.PlayedBy.Choice = null;
+                        Thread.Sleep(2000);
                     }
                     else
                     {
@@ -608,7 +608,7 @@ namespace SixNimmtBot
                         if (thisRow.Count(x => x != null) == 5)
                         {
                             // keep the cards and add the current card to this row
-                            card.PlayedBy.KeptCards.AddRange(thisRow);
+                            card.PlayedBy.KeptCards.AddRange(thisRow.Where(x => x != null));
                             msg += $"{GetTranslation("CardExceedRow", card.PlayedBy.GetName())}\n" +
                                 GetBullsTotalString(thisRow);
                             Send(msg);
@@ -623,6 +623,7 @@ namespace SixNimmtBot
                         }
                     }
 
+                    Thread.Sleep(2000);
                     // at last sort the table again
                     SortTableCards();
                     SendTableCards();
@@ -875,9 +876,14 @@ namespace SixNimmtBot
                     if (Phase == GamePhase.InGame)
                     {
                         var p = Players.FirstOrDefault(x => x.TelegramId == msg.From.Id);
-                        var myCards = GetPlayerKeptCards(p);
-                        msg.ReplyPM($"{GetTranslation("KeptCards")}\n{myCards}");
-                        msg.Reply(GetTranslation("SentPM"));
+                        if (p.KeptCards.Any())
+                        {
+                            var myCards = GetPlayerKeptCards(p);
+                            SendPM(p, $"{GetTranslation("KeptCards")}\n{myCards}");
+                            msg.Reply(GetTranslation("SentPM"));
+                        }
+                        else
+                            msg.Reply(GetTranslation("KeptNoCards"));
                     }
                     break;
             }
