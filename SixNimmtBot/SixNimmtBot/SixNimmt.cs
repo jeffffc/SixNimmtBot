@@ -227,13 +227,15 @@ namespace SixNimmtBot
                 {
                     DbPlayer = new Player
                     {
-                        TelegramId = u.Id,
                         Name = u.FirstName,
-                        Language = "English"
+                        Language = "English",
+                        TelegramId = u.Id,
                     };
                     db.Players.Add(DbPlayer);
-                    db.SaveChanges();
                 }
+                DbPlayer.UserName = player.Username;
+                db.SaveChanges();
+
                 SNPlayer p = new SNPlayer
                 {
                     Name = u.FirstName,
