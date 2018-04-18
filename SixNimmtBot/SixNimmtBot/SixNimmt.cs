@@ -698,6 +698,19 @@ namespace SixNimmtBot
             }
             var wonPlayers = Players.Where(x => x.Score == finalPlayers.Last().Score);
             Send($"{wonPlayers.Select(x => x.GetName()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
+
+            // DB
+            using (var db = new SixNimmtDb())
+            {
+                foreach (var p in wonPlayers)
+                {
+                    var dbgp = DbGame.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
+                    dbgp.Won = true;
+                    dbgp.Bulls = p.FinalScore;
+                }
+                DbGame.TimeEnded = DateTime.UtcNow;
+                db.SaveChanges();
+            }
         }
 
         public void NotifyNextGamePlayers()
@@ -852,7 +865,7 @@ namespace SixNimmtBot
                         AddPlayer(msg.From);
                     break;
                 case "forcestart":
-                    if (this.Players.Count() >= 2) Phase = GamePhase.InGame;
+                    if (this.Players.Count() >= 3) Phase = GamePhase.InGame;
                     else
                     {
                         Send(GetTranslation("GameEnded"));

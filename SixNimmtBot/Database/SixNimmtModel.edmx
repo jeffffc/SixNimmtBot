@@ -32,6 +32,7 @@ warning 6002: The table/view 'sixnimmt.dbo.Admin' does not have a primary key de
           <Property Name="PlayerId" Type="int" Nullable="false" />
           <Property Name="GameId" Type="int" Nullable="false" />
           <Property Name="Won" Type="bit" />
+          <Property Name="Bulls" Type="int" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -141,19 +142,6 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="sixnimmtModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Game">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="GrpId" Type="Int32" Nullable="false" />
-          <Property Name="GroupName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="GroupId" Type="Int64" Nullable="false" />
-          <Property Name="TimeStarted" Type="DateTime" Precision="3" />
-          <Property Name="TimeEnded" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Group" Relationship="Self.FK_Game_Group" FromRole="Game" ToRole="Group" />
-          <NavigationProperty Name="GamePlayers" Relationship="Self.FK_GamePlayer_Game" FromRole="Game" ToRole="GamePlayer" />
-        </EntityType>
         <EntityType Name="GamePlayer">
           <Key>
             <PropertyRef Name="Id" />
@@ -162,8 +150,9 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="PlayerId" Type="Int32" Nullable="false" />
           <Property Name="GameId" Type="Int32" Nullable="false" />
           <Property Name="Won" Type="Boolean" />
-          <NavigationProperty Name="Game" Relationship="Self.FK_GamePlayer_Game" FromRole="GamePlayer" ToRole="Game" />
           <NavigationProperty Name="Player" Relationship="Self.FK_GamePlayer_Player" FromRole="GamePlayer" ToRole="Player" />
+          <Property Name="Bulls" Type="Int32" />
+          <NavigationProperty Name="Game" Relationship="sixnimmtModel.FK_GamePlayer_Game" FromRole="GamePlayer" ToRole="Game" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -177,8 +166,8 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="CreatedBy" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="GroupLink" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreatedTime" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Games" Relationship="Self.FK_Game_Group" FromRole="Group" ToRole="Game" />
           <Property Name="UseSticker" Type="Boolean" />
+          <NavigationProperty Name="Games" Relationship="sixnimmtModel.FK_Game_Group" FromRole="Group" ToRole="Game" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -210,30 +199,6 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="GroupId" Type="Int64" Nullable="false" />
         </EntityType>
-        <Association Name="FK_Game_Group">
-          <End Role="Group" Type="Self.Group" Multiplicity="1" />
-          <End Role="Game" Type="Self.Game" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Group">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Game">
-              <PropertyRef Name="GrpId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_GamePlayer_Game">
-          <End Role="Game" Type="Self.Game" Multiplicity="1" />
-          <End Role="GamePlayer" Type="Self.GamePlayer" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Game">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="GamePlayer">
-              <PropertyRef Name="GameId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_GamePlayer_Player">
           <End Role="Player" Type="Self.Player" Multiplicity="1" />
           <End Role="GamePlayer" Type="Self.GamePlayer" Multiplicity="*" />
@@ -247,46 +212,72 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SixNimmtDb" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Games" EntityType="Self.Game" />
           <EntitySet Name="GamePlayers" EntityType="Self.GamePlayer" />
           <EntitySet Name="Groups" EntityType="Self.Group" />
           <EntitySet Name="Players" EntityType="Self.Player" />
           <EntitySet Name="Admins" EntityType="Self.Admin" />
           <EntitySet Name="NotifyGames" EntityType="Self.NotifyGame" />
-          <AssociationSet Name="FK_Game_Group" Association="Self.FK_Game_Group">
-            <End Role="Group" EntitySet="Groups" />
-            <End Role="Game" EntitySet="Games" />
-          </AssociationSet>
-          <AssociationSet Name="FK_GamePlayer_Game" Association="Self.FK_GamePlayer_Game">
-            <End Role="Game" EntitySet="Games" />
-            <End Role="GamePlayer" EntitySet="GamePlayers" />
-          </AssociationSet>
           <AssociationSet Name="FK_GamePlayer_Player" Association="Self.FK_GamePlayer_Player">
             <End Role="Player" EntitySet="Players" />
             <End Role="GamePlayer" EntitySet="GamePlayers" />
           </AssociationSet>
+          <EntitySet Name="Games" EntityType="sixnimmtModel.Game" />
+          <AssociationSet Name="FK_Game_Group" Association="sixnimmtModel.FK_Game_Group">
+            <End Role="Group" EntitySet="Groups" />
+            <End Role="Game" EntitySet="Games" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GamePlayer_Game" Association="sixnimmtModel.FK_GamePlayer_Game">
+            <End Role="Game" EntitySet="Games" />
+            <End Role="GamePlayer" EntitySet="GamePlayers" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Game">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GrpId" Type="Int32" Nullable="false" />
+          <Property Name="GroupName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="GroupId" Type="Int64" Nullable="false" />
+          <Property Name="TimeStarted" Type="DateTime" Precision="3" />
+          <Property Name="TimeEnded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Group" Relationship="sixnimmtModel.FK_Game_Group" FromRole="Game" ToRole="Group" />
+          <NavigationProperty Name="GamePlayers" Relationship="sixnimmtModel.FK_GamePlayer_Game" FromRole="Game" ToRole="GamePlayer" />
+        </EntityType>
+        <Association Name="FK_Game_Group">
+          <End Type="sixnimmtModel.Group" Role="Group" Multiplicity="1" />
+          <End Type="sixnimmtModel.Game" Role="Game" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Group">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Game">
+              <PropertyRef Name="GrpId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GamePlayer_Game">
+          <End Type="sixnimmtModel.Game" Role="Game" Multiplicity="1" />
+          <End Type="sixnimmtModel.GamePlayer" Role="GamePlayer" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Game">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="GamePlayer">
+              <PropertyRef Name="GameId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="sixnimmtModelStoreContainer" CdmEntityContainer="SixNimmtDb">
-          <EntitySetMapping Name="Games">
-            <EntityTypeMapping TypeName="sixnimmtModel.Game">
-              <MappingFragment StoreEntitySet="Game">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="GrpId" ColumnName="GrpId" />
-                <ScalarProperty Name="GroupName" ColumnName="GroupName" />
-                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
-                <ScalarProperty Name="TimeStarted" ColumnName="TimeStarted" />
-                <ScalarProperty Name="TimeEnded" ColumnName="TimeEnded" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="GamePlayers">
             <EntityTypeMapping TypeName="sixnimmtModel.GamePlayer">
               <MappingFragment StoreEntitySet="GamePlayer">
+                <ScalarProperty Name="Bulls" ColumnName="Bulls" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
                 <ScalarProperty Name="GameId" ColumnName="GameId" />
@@ -337,6 +328,18 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
               <MappingFragment StoreEntitySet="NotifyGame">
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Games">
+            <EntityTypeMapping TypeName="sixnimmtModel.Game">
+              <MappingFragment StoreEntitySet="Game">
+                <ScalarProperty Name="TimeEnded" ColumnName="TimeEnded" />
+                <ScalarProperty Name="TimeStarted" ColumnName="TimeStarted" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="GroupName" ColumnName="GroupName" />
+                <ScalarProperty Name="GrpId" ColumnName="GrpId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
