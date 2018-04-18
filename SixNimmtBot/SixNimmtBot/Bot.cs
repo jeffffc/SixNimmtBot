@@ -192,7 +192,24 @@ namespace SixNimmtBot
         public static void ReplyPM(this Message m, string[] texts, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
         {
             foreach (var text in texts)
-                m.ReplyPM(text, replyMarkup, parseMode, disableWebPagePreview, disableNotification);
+            {
+                try
+                {
+                    var r = Bot.Api.SendTextMessageAsync(m.From.Id, text, parseMode, disableWebPagePreview, disableNotification, 0, replyMarkup).Result;
+                    if (r == null)
+                    {
+                        m.Reply(Helpers.GetTranslation("NotStartedBot", Helpers.GetLanguage(m.From.Id)), new InlineKeyboardMarkup(new InlineKeyboardButton[] {
+                            new InlineKeyboardUrlButton("Start me!", $"https://t.me/{Bot.Me.Username}") }));
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.LogError();
+                }
+            }
+            if (m.Chat.Type != ChatType.Private)
+                m.Reply(Helpers.GetTranslation("SentPM", Helpers.GetLanguage(m.From.Id)));
         }
 
         public static Message ReplyPM(this Message m, string text, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
