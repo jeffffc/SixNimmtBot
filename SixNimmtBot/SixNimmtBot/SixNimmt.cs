@@ -705,7 +705,7 @@ namespace SixNimmtBot
             {
                 foreach (var p in Players)
                 {
-                    var dbgp = db.GamePlayers.FirstOrDefault(x => x.Player.TelegramId == p.TelegramId);
+                    var dbgp = db.GamePlayers.FirstOrDefault(x => x.Player.Id == p.Id);
                     dbgp.Bulls = p.FinalScore;
                     if (wonPlayers.Contains(p))
                         dbgp.Won = true;

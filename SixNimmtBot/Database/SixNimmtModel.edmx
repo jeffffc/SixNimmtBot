@@ -31,7 +31,7 @@ warning 6002: The table/view 'sixnimmt.dbo.Admin' does not have a primary key de
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PlayerId" Type="int" Nullable="false" />
           <Property Name="GameId" Type="int" Nullable="false" />
-          <Property Name="Won" Type="bit" />
+          <Property Name="Won" Type="bit" Nullable="false" />
           <Property Name="Bulls" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Group">
@@ -158,7 +158,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="PlayerId" Type="Int32" Nullable="false" />
           <Property Name="GameId" Type="Int32" Nullable="false" />
-          <Property Name="Won" Type="Boolean" />
+          <Property Name="Won" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Player" Relationship="Self.FK_GamePlayer_Player" FromRole="GamePlayer" ToRole="Player" />
           <Property Name="Bulls" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Game" Relationship="sixnimmtModel.FK_GamePlayer_Game" FromRole="GamePlayer" ToRole="Game" />

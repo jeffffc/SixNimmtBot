@@ -17,7 +17,7 @@ namespace Database
         public int Id { get; set; }
         public int PlayerId { get; set; }
         public int GameId { get; set; }
-        public Nullable<bool> Won { get; set; }
+        public bool Won { get; set; }
         public int Bulls { get; set; }
     
         public virtual Player Player { get; set; }
