@@ -145,5 +145,19 @@ namespace SixNimmtBot
                game.HandleMessage(msg);
             }
         }
+
+        [Command(Trigger = "mycards", GroupOnly = true)]
+        public static void MyCards(Message msg, string[] args)
+        {
+            SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
+            if (game == null)
+            {
+                return;
+            }
+            else
+            {
+                game.HandleMessage(msg);
+            }
+        }
     }
 }

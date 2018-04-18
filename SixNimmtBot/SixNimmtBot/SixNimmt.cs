@@ -396,6 +396,20 @@ namespace SixNimmtBot
             return msg.ToCode();
         }
 
+        public string GetPlayerKeptCards(SNPlayer p)
+        {
+            var cards = p.KeptCards;
+            var list = cards.OrderByDescending(x => x.Bulls).ThenBy(x => x.Number);
+            string msg = "";
+            // Select(x => x.GetName()).Aggregate((x, y) => x + "\n" + y)
+            for (int i = 0; i < list.Count(); i += 2)
+            {
+                var items = list.Skip(i).Take(2).ToList();
+                msg += items.Select(x => x.GetName().PadRight(13)).Aggregate((x, y) => x + " " + y) + Environment.NewLine;
+            }
+            return msg.ToCode();
+        }
+
         public string GetBullsTotalString(List<SNCard> row)
         {
             return GetBullsTotalString(row.ToArray());
@@ -836,17 +850,20 @@ namespace SixNimmtBot
                     Phase = GamePhase.Ending;
                     Bot.RemoveGame(this);
                     break;
-                case "seq":
-                    if (_playerList == 0)
-                        Reply(msg.MessageId, GetTranslation("PlayerSequenceNotStarted"));
-                    else
-                        Reply(_playerList, GetTranslation("GetPlayerSequence"));
-                    break;
                 case "extend":
                     if (Phase == GamePhase.Joining)
                     {
                         _secondsToAdd += Constants.ExtendTime;
                         Reply(msg.MessageId, GetTranslation("ExtendJoining", Constants.ExtendTime));
+                    }
+                    break;
+                case "mycards":
+                    if (Phase == GamePhase.InGame)
+                    {
+                        var p = Players.FirstOrDefault(x => x.TelegramId == msg.From.Id);
+                        var myCards = GetPlayerKeptCards(p);
+                        msg.ReplyPM($"{GetTranslation("KeptCards")}\n{myCards}");
+                        msg.Reply(GetTranslation("SentPM"));
                     }
                     break;
             }
