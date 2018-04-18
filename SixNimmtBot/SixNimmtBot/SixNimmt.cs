@@ -233,7 +233,7 @@ namespace SixNimmtBot
                     };
                     db.Players.Add(DbPlayer);
                 }
-                DbPlayer.UserName = player.Username;
+                DbPlayer.UserName = u.Username;
                 db.SaveChanges();
 
                 SNPlayer p = new SNPlayer
