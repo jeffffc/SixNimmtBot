@@ -20,16 +20,18 @@ namespace SixNimmtBot
         {
             if (msg.Date > DateTime.UtcNow.AddSeconds(-3))
             {
+                var sent = msg.Reply("Waiting for games to finish and then I will update the bot.");
                 Process.Start(Path.Combine(@"C:\SixNimmtBot\", "Updater.exe"), msg.Chat.Id.ToString());
                 Program.MaintMode = true;
-                new Thread(CheckCurrentGames).Start();
+                new Thread(x => CheckCurrentGames(sent)).Start();
             }
         }
 
-        public static void CheckCurrentGames()
+        public static void CheckCurrentGames(Message msg)
         {
             while (Bot.Games.Count > 0)
                 Thread.Sleep(1000);
+            msg.Reply("Updating the bot now...");
             Environment.Exit(1);
             return;
         }
