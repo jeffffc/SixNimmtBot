@@ -261,7 +261,7 @@ namespace SixNimmtBot
                     Message ret;
                     try
                     {
-                        ret = SendPM(p, GetTranslation("YouJoined", GroupName));
+                        ret = SendPM(p, GetTranslation("YouJoined", GroupName), GroupMarkup);
                     }
                     catch
                     {
@@ -799,9 +799,9 @@ namespace SixNimmtBot
             return Bot.Send(ChatId, msg);
         }
 
-        public Message SendPM(SNPlayer p, string msg)
+        public Message SendPM(SNPlayer p, string msg, InlineKeyboardMarkup markup = null)
         {
-            return Bot.Send(p.TelegramId, msg);
+            return Bot.Send(p.TelegramId, msg, markup);
         }
 
         public Message SendMenu(SNPlayer p, string msg, InlineKeyboardMarkup markup)
