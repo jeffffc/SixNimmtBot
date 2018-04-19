@@ -979,7 +979,7 @@ namespace SixNimmtBot
                     if (p.CurrentQuestion != null)
                     {
                         p.Choice = int.Parse(args[3]);
-                        BotMethods.Edit(GetTranslation("ReceivedButton") + GetTranslation("Row", $" - {p.Choice + 1}"), query.Message, GroupMarkup);
+                        BotMethods.Edit(GetTranslation("ReceivedButton") + $" - {GetTranslation("Row", p.Choice + 1)}", query.Message, GroupMarkup);
                         p.CurrentQuestion = null;
                     }
                     break;
