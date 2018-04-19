@@ -26,7 +26,7 @@ namespace SixNimmtBot
                 }
 
 
-                Bot.AddGame(new SixNimmt(msg.Chat.Id, msg.From, msg.Chat.Title));
+                Bot.AddGame(new SixNimmt(msg.Chat.Id, msg.From, msg.Chat.Title, msg.Chat.Username));
             }
             else
             {
@@ -101,7 +101,10 @@ namespace SixNimmtBot
             }
             else
             {
-               game.HandleMessage(msg);
+                game.HandleMessage(msg);
+                Bot.RemoveGame(game);
+                game.Dispose();
+                game = null;
             }
         }
 

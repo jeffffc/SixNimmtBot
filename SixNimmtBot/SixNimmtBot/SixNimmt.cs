@@ -27,6 +27,8 @@ namespace SixNimmtBot
         public long ChatId;
         public string GroupName;
         public int GameId;
+        public string GroupLink;
+        public InlineKeyboardMarkup GroupMarkup;
         public Group DbGroup;
         public List<SNPlayer> Players = new List<SNPlayer>();
         public List<SNCard[]> TableCards = new List<SNCard[]>();
@@ -48,7 +50,7 @@ namespace SixNimmtBot
         #endregion
 
 
-        public SixNimmt(long chatId, User u, string groupName)
+        public SixNimmt(long chatId, User u, string groupName, string chatUsername = null)
         {
             #region Creating New Game - Preparation
             using (var db = new SixNimmtDb())
@@ -57,6 +59,16 @@ namespace SixNimmtBot
                 GroupName = groupName;
                 DbGroup = db.Groups.FirstOrDefault(x => x.GroupId == ChatId);
                 UseSticker = DbGroup.UseSticker ?? false;
+                DbGroup.UserName = chatUsername;
+                db.SaveChanges();
+                GroupLink = DbGroup.UserName != null ? $"https://t.me/{DbGroup.UserName}" : DbGroup.GroupLink ?? null;
+                if (GroupLink != null)
+                    GroupMarkup = new InlineKeyboardMarkup(
+                        new InlineKeyboardButton[][] {
+                            new InlineKeyboardUrlButton[] {
+                                new InlineKeyboardUrlButton(GroupName, GroupLink)
+                            }
+                        });
                 LoadLanguage(DbGroup.Language);
                 if (DbGroup == null)
                     Bot.RemoveGame(this);
@@ -920,8 +932,6 @@ namespace SixNimmtBot
                     break;
                 case "killgame":
                     Send(GetTranslation("KillGame"));
-                    Phase = GamePhase.Ending;
-                    Bot.RemoveGame(this);
                     break;
                 case "extend":
                     if (Phase == GamePhase.Joining)
@@ -961,7 +971,7 @@ namespace SixNimmtBot
                     if (p.CurrentQuestion != null)
                     {
                         p.Choice = int.Parse(args[3]);
-                        BotMethods.Edit($"OK - {p.Choice}", query.Message);
+                        BotMethods.Edit(GetTranslation("ReceivedButton", $" - {p.Choice}"), query.Message, GroupMarkup);
                         p.CurrentQuestion = null;
                     }
                     break;
@@ -969,7 +979,7 @@ namespace SixNimmtBot
                     if (p.CurrentQuestion != null)
                     {
                         p.Choice = int.Parse(args[3]);
-                        BotMethods.Edit($"OK - Row {p.Choice + 1}", query.Message);
+                        BotMethods.Edit(GetTranslation("ReceivedButton", GetTranslation("Row", $" - {p.Choice + 1}")), query.Message, GroupMarkup);
                         p.CurrentQuestion = null;
                     }
                     break;

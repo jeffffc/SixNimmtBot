@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -21,7 +22,7 @@ namespace SixNimmtBot
         public static void Start(Message msg, string[] args)
         {
             if (msg.Chat.Type != ChatType.Private) return;
-            if (args.Length == 0)
+            if (args[1] == null)
             {
                 msg.Reply("Thank you for starting me. This bot is still in BETA phase. Use /config to change the language and display of table cards.");
             }
@@ -321,6 +322,51 @@ namespace SixNimmtBot
                 msg2 = noAchvList.Aggregate(msg2, (current, a) => current + $"{a.GetAchvName(lang).ToBold()}\n{a.GetAchvDescription(lang)}\n\n");
                 msg.ReplyPM(new[] { msg1, msg2 });
             }
+        }
+
+        [Attributes.Command(Trigger = "setlink", GroupOnly = true, AdminOnly = true)]
+        public static void SetLink(Message msg, string[] args)
+        {
+            if (!String.IsNullOrEmpty(msg.Chat.Username))
+            {
+                msg.Reply(GetTranslation("SetLinkDone", GetLanguage(msg.Chat.Id), "https://t.me/{msg.Chat.Username"));
+                return;
+            }
+
+            if (args.Length < 2 || String.IsNullOrEmpty(args[1]))
+            {
+                msg.Reply(GetTranslation("SetLinkNoLink", GetLanguage(msg.Chat.Id)));
+                return;
+            }
+
+            var link = args[1].Trim();
+
+            if (!Regex.IsMatch(link, @"^(https?:\/\/)?t(elegram)?\.me\/joinchat\/([a-zA-Z0-9_\-]+)$"))
+            {
+                msg.Reply(GetTranslation("SetLinkInvalidLink", GetLanguage(msg.Chat.Id)));
+                return;
+            }
+            using (var db = new SixNimmtDb())
+            {
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == msg.Chat.Id) ?? MakeDefaultGroup(msg.Chat);
+                grp.GroupLink = link;
+                db.SaveChanges();
+            }
+
+            msg.Reply(GetTranslation("SetLinkDone", GetLanguage(msg.Chat.Id), $"<a href=\"{link}\">{msg.Chat.Title.FormatHTML()}</a>"));
+        }
+
+        [Attributes.Command(Trigger = "remlink", AdminOnly = true, GroupOnly = true)]
+        public static void RemLink(Message msg, string[] args)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == msg.Chat.Id) ?? MakeDefaultGroup(msg.Chat);
+                grp.GroupLink = null;
+                db.SaveChanges();
+            }
+
+            msg.Reply(GetTranslation("LinkRemoved", GetLanguage(msg.Chat.Id)));
         }
     }
 }
