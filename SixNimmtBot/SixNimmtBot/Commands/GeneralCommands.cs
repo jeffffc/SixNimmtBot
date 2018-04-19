@@ -289,13 +289,16 @@ namespace SixNimmtBot
                 int numOfWins = db.GetNumOfWins(playerId).First().Value;
                 var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
                 var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
+
+                var avg = (float)numOfBulls / (float)numOfGames;
                 var send = GetTranslation("StatsDetails", GetLanguage(isGroup == true ? msg.Chat.Id : playerId),
                     playerName,
                     achvCount.ToBold(),
                     numOfGames.ToBold(),
                     $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
                     $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)}%)".ToBold(),
-                    numOfBulls.ToBold()
+                    numOfBulls.ToBold(),
+                    avg.ToString("#.##").ToBold()
                     );
                 msg.Reply(send);
             }
