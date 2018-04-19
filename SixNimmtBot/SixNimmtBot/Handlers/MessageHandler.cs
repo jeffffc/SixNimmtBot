@@ -80,7 +80,7 @@ namespace SixNimmtBot.Handlers
 
                     if (me)
                     {
-                        msg.ReplyNoQuote("Thank you for adding me into this chat! [6 Nimmt!] is a board game orininated in Germany, it's meaning is [Take 6!]." +
+                        msg.ReplyNoQuote("Thank you for adding me into this chat! [6 Nimmt!] is a board game orininated in Germany, it's meaning is [Take 6!]. " +
                             "It is a easy game to be played by 3 - 10 players. Admins can use /config to do simple configurations. Press /startgame to start a new game now!");
                     }
                     break;
