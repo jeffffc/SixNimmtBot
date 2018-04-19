@@ -1,5 +1,5 @@
 ﻿using Database;
-using SixNimmtBot.Models;
+using SixNimmtBot.Models.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;

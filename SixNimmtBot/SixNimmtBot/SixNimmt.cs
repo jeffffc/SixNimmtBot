@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using SixNimmtBot.Models;
+using SixNimmtBot.Models.Game;
 using SixNimmtBot.Models.General;
 using SixNimmtBot;
 using System.Threading;
