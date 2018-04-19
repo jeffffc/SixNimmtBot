@@ -66,7 +66,23 @@ namespace SixNimmtBot.Handlers
                     }
                     break;
                 case MessageType.ServiceMessage:
-                    //
+                    bool me = false;
+                    if (msg.NewChatMembers.Any())
+                    {
+                        foreach (var c in msg.NewChatMembers)
+                        {
+                            if (c.Id == Bot.Me.Id)
+                                me = true;
+                        }
+                    }
+                    if (msg.NewChatMember != null && msg.NewChatMember.Id == Bot.Me.Id)
+                        me = true;
+
+                    if (me)
+                    {
+                        msg.ReplyNoQuote("Thank you for adding me into this chat! [6 Nimmt!] is a board game orininated in Germany, it's meaning is [Take 6!]." +
+                            "It is a easy game to be played by 3 - 10 players. Admins can use /config to do simple configurations. Press /startgame to start a new game now!");
+                    }
                     break;
                     /*
                 case MessageType.SuccessfulPayment:
