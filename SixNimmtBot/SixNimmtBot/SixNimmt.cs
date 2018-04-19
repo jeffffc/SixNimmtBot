@@ -66,7 +66,7 @@ namespace SixNimmtBot
                     GroupMarkup = new InlineKeyboardMarkup(
                         new InlineKeyboardButton[][] {
                             new InlineKeyboardUrlButton[] {
-                                new InlineKeyboardUrlButton(GroupName, GroupLink)
+                                new InlineKeyboardUrlButton(GetTranslation("BackGroup", GroupName), GroupLink)
                             }
                         });
                 LoadLanguage(DbGroup.Language);
@@ -971,7 +971,7 @@ namespace SixNimmtBot
                     if (p.CurrentQuestion != null)
                     {
                         p.Choice = int.Parse(args[3]);
-                        BotMethods.Edit(GetTranslation("ReceivedButton", $" - {p.Choice}"), query.Message, GroupMarkup);
+                        BotMethods.Edit(GetTranslation("ReceivedButton") + $" - {p.Choice}", query.Message, GroupMarkup);
                         p.CurrentQuestion = null;
                     }
                     break;
@@ -979,7 +979,7 @@ namespace SixNimmtBot
                     if (p.CurrentQuestion != null)
                     {
                         p.Choice = int.Parse(args[3]);
-                        BotMethods.Edit(GetTranslation("ReceivedButton", GetTranslation("Row", $" - {p.Choice + 1}")), query.Message, GroupMarkup);
+                        BotMethods.Edit(GetTranslation("ReceivedButton") + GetTranslation("Row", $" - {p.Choice + 1}"), query.Message, GroupMarkup);
                         p.CurrentQuestion = null;
                     }
                     break;

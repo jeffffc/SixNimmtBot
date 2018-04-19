@@ -299,7 +299,7 @@ namespace SixNimmtBot
                     $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
                     $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)}%)".ToBold(),
                     numOfBulls.ToBold(),
-                    avg.ToString("#.##").ToBold()
+                    avg.ToString("F").ToBold()
                     );
                 msg.Reply(send);
             }
