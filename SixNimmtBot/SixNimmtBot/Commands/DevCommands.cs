@@ -18,9 +18,14 @@ namespace SixNimmtBot
         [Command(Trigger = "update", DevOnly = true)]
         public static void Update(Message msg, string[] args)
         {
-            if (msg.Date > DateTime.UtcNow.AddSeconds(-3))
+            if (msg.Date > DateTime.UtcNow.AddSeconds(-3) || msg.From.Id == Bot.Me.Id)
             {
-                var sent = msg.Reply("Waiting for games to finish and then I will update the bot.");
+                var txt = "Waiting for games to finish and then I will update the bot.";
+                Message sent;
+                if (msg.From.Id == Bot.Me.Id)
+                    sent = Bot.Edit(msg.Chat.Id, msg.MessageId, $"{msg.Text}\n\n{txt}");
+                else
+                    sent = msg.Reply(txt);
                 Process.Start(Path.Combine(@"C:\SixNimmtBot\", "Updater.exe"), msg.Chat.Id.ToString());
                 Program.MaintMode = true;
                 new Thread(x => CheckCurrentGames(sent)).Start();
