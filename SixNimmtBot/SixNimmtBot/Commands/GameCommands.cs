@@ -17,7 +17,6 @@ namespace SixNimmtBot
         [Command(Trigger = "startgame", GroupOnly = true)]
         public static void StartGame(Message msg, string[] args)
         {
-            Thread.Sleep(200);
             SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
             if (game == null)
             {

@@ -28,6 +28,7 @@ namespace SixNimmtBot
         public string GroupName;
         public int GameId;
         public string GroupLink;
+        public DateTime TimeCreated;
         public InlineKeyboardMarkup GroupMarkup;
         public Group DbGroup;
         public List<SNPlayer> Players = new List<SNPlayer>();
@@ -54,6 +55,7 @@ namespace SixNimmtBot
         public SixNimmt(long chatId, User u, string groupName, string chatUsername = null)
         {
             #region Creating New Game - Preparation
+            TimeCreated = DateTime.UtcNow;
             using (var db = new SixNimmtDb())
             {
                 ChatId = chatId;
@@ -107,25 +109,31 @@ namespace SixNimmtBot
                             break;
                         if (this.Phase == GamePhase.Ending)
                             return;
+                        if (this.Phase == GamePhase.KillGame)
+                            return;
                         //try to remove duplicated game
                         if (i == 10)
                         {
                             var count = Bot.Games.Count(x => x.ChatId == ChatId);
                             if (count > 1)
                             {
-                                var toDel = Bot.Games.OrderBy(x => x.Players.Count).FirstOrDefault(x => x.Id != this.Id && x.Phase != GamePhase.InGame);
+                                var toDel = Bot.Games.Where(x => x.Players.Count < this.Players.Count).OrderBy(x => x.Players.Count).Where(x => x.Id != this.Id && x.Phase != GamePhase.InGame);
                                 if (toDel != null)
                                 {
-                                    Bot.Send(toDel.ChatId, GetTranslation("DuplicatedGameRemoving"));
-                                    toDel.Phase = GamePhase.KillGame;
+                                    Send(GetTranslation("DuplicatedGameRemoving"));
 
-                                    try
+                                    foreach (var g in toDel)
                                     {
-                                        Bot.RemoveGame(toDel);
-                                    }
-                                    catch
-                                    {
-                                        // should be removed already
+                                        g.Phase = GamePhase.KillGame;
+
+                                        try
+                                        {
+                                            Bot.RemoveGame(g);
+                                        }
+                                        catch
+                                        {
+                                            // should be removed already
+                                        }
                                     }
                                 }
                             }
@@ -487,7 +495,7 @@ namespace SixNimmtBot
                 {
                     var playerMentions = Players.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                     firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard")}\n{playerMentions}";
-                    Send(firstMsg);
+                    Send(firstMsg, BotMarkup);
                     var currentSticker = GetTableCardsImage(TableCards);
                     foreach (var p in Players)
                     {
@@ -517,7 +525,7 @@ namespace SixNimmtBot
                             var playersHaveNotPlayed = Players.Where(x => x.CurrentQuestion != null)
                                 .Select(x => x.GetMention())
                                 .Aggregate((x, y) => x + ", " + y);
-                            Send($"{GetTranslation("ChooseCard15Secs")}\n{playersHaveNotPlayed}");
+                            Send($"{GetTranslation("ChooseCard15Secs")}\n{playersHaveNotPlayed}", BotMarkup);
                         }
                     }
                 }
@@ -601,7 +609,7 @@ namespace SixNimmtBot
                         */
 
                         /* NEW: PLAYER CHOOSE WHICH ROW TO KEEP */
-                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention())}");
+                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention())}", BotMarkup);
                         SendMenu(card.PlayedBy,
                             GetTableCardsString() +
                             Environment.NewLine + Environment.NewLine +
@@ -823,9 +831,9 @@ namespace SixNimmtBot
 
         #region Bot API Related Methods
 
-        public Message Send(string msg)
+        public Message Send(string msg, InlineKeyboardMarkup markup = null)
         {
-            return Bot.Send(ChatId, msg);
+            return Bot.Send(ChatId, msg, markup);
         }
 
         public Message SendPM(SNPlayer p, string msg, InlineKeyboardMarkup markup = null)

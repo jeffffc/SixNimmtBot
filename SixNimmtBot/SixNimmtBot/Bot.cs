@@ -86,12 +86,12 @@ namespace SixNimmtBot
 
         public static SixNimmt GetGameByGuid(Guid guid)
         {
-            return Program.Games.FirstOrDefault(x => x.Id == guid);
+            return Program.Games.OrderBy(x => x.TimeCreated).FirstOrDefault(x => x.Id == guid);
         }
 
         public static SixNimmt GetGameByChatId(long chatId)
         {
-            return Program.Games.FirstOrDefault(x => x.ChatId == chatId);
+            return Program.Games.OrderBy(x => x.TimeCreated).FirstOrDefault(x => x.ChatId == chatId);
         }
 
         public static void AddGame(SixNimmt game)
@@ -104,7 +104,7 @@ namespace SixNimmtBot
             Program.Games.Remove(game);
         }
 
-        public static void RemoveGame( string id)
+        public static void RemoveGame(string id)
         {
             RemoveGame(GetGameByGuid(id));
         }
