@@ -111,7 +111,15 @@ namespace SixNimmtBot
                                 {
                                     Bot.Send(toDel.ChatId, GetTranslation("DuplicatedGameRemoving"));
                                     toDel.Phase = GamePhase.KillGame;
-                                    Bot.RemoveGame(toDel);
+
+                                    try
+                                    {
+                                        Bot.RemoveGame(toDel);
+                                    }
+                                    catch
+                                    {
+                                        // should be removed already
+                                    }
                                 }
                             }
                         }
