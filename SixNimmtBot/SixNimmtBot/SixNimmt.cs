@@ -42,6 +42,7 @@ namespace SixNimmtBot
         public bool UseSticker = false;
         public Database.Game DbGame;
         public int Round = 1;
+        public InlineKeyboardMarkup BotMarkup;
         
 
         public Locale Locale;
@@ -70,6 +71,12 @@ namespace SixNimmtBot
                             }
                         });
                 LoadLanguage(DbGroup.Language);
+                BotMarkup = new InlineKeyboardMarkup(
+                    new InlineKeyboardButton[][] {
+                        new InlineKeyboardButton[] {
+                            new InlineKeyboardUrlButton(GetTranslation("GoToBot"), $"https://t.me/{Bot.Me.Username}")
+                        }
+                    });
                 if (DbGroup == null)
                     Bot.RemoveGame(this);
             }
@@ -210,7 +217,7 @@ namespace SixNimmtBot
                         SendTableCards();
                         foreach (var player in Players)
                         {
-                            SendPM(player, GetPlayerInitialCards(player.CardsInHand));
+                            SendPM(player, $"{GetTranslation("CardsInHand")}\n{GetPlayerCards(player.CardsInHand)}");
                         }
                         while (Phase != GamePhase.Ending)
                         {
@@ -417,7 +424,7 @@ namespace SixNimmtBot
             return table.ToStringAlternative().ToCode();
         }
 
-        public string GetPlayerInitialCards(List<SNCard> cards)
+        public string GetPlayerCards(List<SNCard> cards)
         {
             var list = cards.OrderBy(x => x.Number);
             string msg = "";
@@ -967,14 +974,22 @@ namespace SixNimmtBot
                     if (Phase == GamePhase.InGame)
                     {
                         var p = Players.FirstOrDefault(x => x.TelegramId == msg.From.Id);
+                        string toSend = "";
+                        if (p.CardsInHand.Any())
+                            toSend = $"{GetTranslation("CardsInHand")}\n{GetPlayerCards(p.CardsInHand)}";
                         if (p.KeptCards.Any())
                         {
                             var myCards = GetPlayerKeptCards(p);
-                            SendPM(p, $"{GetTranslation("KeptCards")}\n{myCards}");
-                            msg.Reply(GetTranslation("SentPM"));
+                            toSend += $"\n\n{GetTranslation("KeptCards")}\n{myCards}";
                         }
+                        SendPM(p, toSend);
+                        msg.Reply(GetTranslation("SentPM"));
+
+                        /*
+                         * // commented because people want to see their unused card too
                         else
                             msg.Reply(GetTranslation("KeptNoCards"));
+                        */
                     }
                     break;
             }
