@@ -116,7 +116,14 @@ namespace SixNimmtBot
                 var table = new ConsoleTables.ConsoleTable("Game GUID", "ChatId", "Phase", "# of Players");
                 foreach (SixNimmt game in games)
                 {
-                    table.AddRow(game.Id.ToString(), game.ChatId.ToString(), game.Phase.ToString(), game.Players.Count().ToString());
+                    try
+                    {
+                        table.AddRow(game.Id.ToString(), game.ChatId.ToString(), game.Phase.ToString(), game.Players.Count().ToString());
+                    }
+                    catch
+                    {
+                        // no game?
+                    }
                 }
                 table.Write(ConsoleTables.Format.Alternative);
 

@@ -90,132 +90,145 @@ namespace SixNimmtBot
 
         private void GameTimer()
         {
-            while (Phase != GamePhase.Ending)
+            while (Phase != GamePhase.Ending && Phase != GamePhase.KillGame)
             {
-                for (var i = 0; i < JoinTime; i++)
+                try
                 {
-                    if (this.Phase == GamePhase.InGame)
-                        break;
-                    if (this.Phase == GamePhase.Ending)
-                        return;
-                    //try to remove duplicated game
-                    if (i == 10)
+                    for (var i = 0; i < JoinTime; i++)
                     {
-                        var count = Bot.Games.Count(x => x.ChatId == ChatId);
-                        if (count > 1)
+                        if (this.Phase == GamePhase.InGame)
+                            break;
+                        if (this.Phase == GamePhase.Ending)
+                            return;
+                        //try to remove duplicated game
+                        if (i == 10)
                         {
-                            var toDel = Bot.Games.FirstOrDefault(x => x.Id != this.Id && x.Phase != GamePhase.InGame);
-                            if (toDel != null)
+                            var count = Bot.Games.Count(x => x.ChatId == ChatId);
+                            if (count > 1)
                             {
-                                Bot.Send(toDel.ChatId, GetTranslation("DuplicatedGameRemoving"));
-                                toDel.Phase = GamePhase.Ending;
-                                Bot.RemoveGame(toDel);
+                                var toDel = Bot.Games.OrderBy(x => x.Players.Count).FirstOrDefault(x => x.Id != this.Id && x.Phase != GamePhase.InGame);
+                                if (toDel != null)
+                                {
+                                    Bot.Send(toDel.ChatId, GetTranslation("DuplicatedGameRemoving"));
+                                    toDel.Phase = GamePhase.KillGame;
+                                    Bot.RemoveGame(toDel);
+                                }
                             }
                         }
-                    }
-                    if (_secondsToAdd != 0)
-                    {
-                        i = Math.Max(i - _secondsToAdd, Constants.JoinTime - Constants.JoinTimeMax);
-                        // Bot.Send(ChatId, GetTranslation("JoinTimeLeft", TimeSpan.FromSeconds(Constants.JoinTime - i).ToString(@"mm\:ss")));
-                        _secondsToAdd = 0;
-                    }
-                    var specialTime = JoinTime - i;
-                    if (new int[] { 10, 30, 60, 90 }.Contains(specialTime))
-                    {
-                        Bot.Send(ChatId, GetTranslation("JoinTimeSpecialSeconds", specialTime));
-                    }
-                    if (Players.Count == 10)
-                        break;
-                    Thread.Sleep(1000);
-                }
-
-                if (this.Phase == GamePhase.Ending)
-                    return;
-                do
-                {
-                    SNPlayer p = Players.FirstOrDefault(x => Players.Count(y => y.TelegramId == x.TelegramId) > 1);
-                    if (p == null) break;
-                    Players.Remove(p);
-                }
-                while (true);
-
-                if (this.Phase == GamePhase.Ending)
-                    return;
-
-                if (this.Players.Count() >= Constants.MinPlayer)
-                    this.Phase = GamePhase.InGame;
-                if (this.Phase != GamePhase.InGame)
-                {
-                    /*
-                    this.Phase = GamePhase.Ending;
-                    Bot.RemoveGame(this);
-                    Bot.Send(ChatId, "Game ended!");
-                    */
-                }
-                else
-                {
-                    #region Ready to start game
-                    if (Players.Count < Constants.MinPlayer)
-                    {
-                        Send(GetTranslation("GameEnded"));
-                        return;
-                    }
-
-                    Bot.Send(ChatId, GetTranslation("GameStart"));
-
-                    // create game + gameplayers in db
-                    using (var db = new SixNimmtDb())
-                    {
-                        DbGame = new Database.Game
+                        if (_secondsToAdd != 0)
                         {
-                            GrpId = DbGroup.Id,
-                            GroupId = ChatId,
-                            GroupName = GroupName,
-                            TimeStarted = DateTime.UtcNow
-                        };
-                        db.Games.Add(DbGame);
-                        db.SaveChanges();
-                        GameId = DbGame.Id;
-                        foreach (var p in Players)
-                        {
-                            GamePlayer DbGamePlayer = new GamePlayer
-                            {
-                                PlayerId = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId).Id,
-                                GameId = GameId
-                            };
-                            db.GamePlayers.Add(DbGamePlayer);
+                            i = Math.Max(i - _secondsToAdd, Constants.JoinTime - Constants.JoinTimeMax);
+                            // Bot.Send(ChatId, GetTranslation("JoinTimeLeft", TimeSpan.FromSeconds(Constants.JoinTime - i).ToString(@"mm\:ss")));
+                            _secondsToAdd = 0;
                         }
-                        db.SaveChanges();
-                    }
-
-                    PrepareGame();
-                    SortTableCards();
-
-                    // remove joined players from nextgame list
-                    // RemoveFromNextGame(Players.Select(x => x.TelegramId).ToList());
-
-                    #endregion
-
-                    #region Start!
-                    SendTableCards();
-                    foreach (var player in Players)
-                    {
-                        SendPM(player, GetPlayerInitialCards(player.CardsInHand));
-                    }
-                    while (Phase != GamePhase.Ending)
-                    {
-                        // _playerList = Send(GeneratePlayerList()).MessageId;
-                        PlayersChooseCard();
-                        if (Phase == GamePhase.Ending)
+                        var specialTime = JoinTime - i;
+                        if (new int[] { 10, 30, 60, 90 }.Contains(specialTime))
+                        {
+                            Bot.Send(ChatId, GetTranslation("JoinTimeSpecialSeconds", specialTime));
+                        }
+                        if (Players.Count == 10)
                             break;
-                        // NextPlayer();
+                        Thread.Sleep(1000);
                     }
-                    EndGame();
-                    #endregion
-                }
-                this.Phase = GamePhase.Ending;
-                Bot.Send(ChatId, GetTranslation("GameEnded"));
 
+                    if (this.Phase == GamePhase.Ending)
+                        return;
+                    do
+                    {
+                        SNPlayer p = Players.FirstOrDefault(x => Players.Count(y => y.TelegramId == x.TelegramId) > 1);
+                        if (p == null) break;
+                        Players.Remove(p);
+                    }
+                    while (true);
+
+                    if (this.Phase == GamePhase.Ending)
+                        return;
+
+                    if (this.Players.Count() >= Constants.MinPlayer)
+                        this.Phase = GamePhase.InGame;
+                    if (this.Phase != GamePhase.InGame)
+                    {
+                        /*
+                        this.Phase = GamePhase.Ending;
+                        Bot.RemoveGame(this);
+                        Bot.Send(ChatId, "Game ended!");
+                        */
+                    }
+                    else
+                    {
+                        #region Ready to start game
+                        if (Players.Count < Constants.MinPlayer)
+                        {
+                            Send(GetTranslation("GameEnded"));
+                            return;
+                        }
+
+                        Bot.Send(ChatId, GetTranslation("GameStart"));
+
+                        // create game + gameplayers in db
+                        using (var db = new SixNimmtDb())
+                        {
+                            DbGame = new Database.Game
+                            {
+                                GrpId = DbGroup.Id,
+                                GroupId = ChatId,
+                                GroupName = GroupName,
+                                TimeStarted = DateTime.UtcNow
+                            };
+                            db.Games.Add(DbGame);
+                            db.SaveChanges();
+                            GameId = DbGame.Id;
+                            foreach (var p in Players)
+                            {
+                                GamePlayer DbGamePlayer = new GamePlayer
+                                {
+                                    PlayerId = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId).Id,
+                                    GameId = GameId
+                                };
+                                db.GamePlayers.Add(DbGamePlayer);
+                            }
+                            db.SaveChanges();
+                        }
+
+                        PrepareGame();
+                        SortTableCards();
+
+                        // remove joined players from nextgame list
+                        // RemoveFromNextGame(Players.Select(x => x.TelegramId).ToList());
+
+                        #endregion
+
+                        #region Start!
+                        SendTableCards();
+                        foreach (var player in Players)
+                        {
+                            SendPM(player, GetPlayerInitialCards(player.CardsInHand));
+                        }
+                        while (Phase != GamePhase.Ending)
+                        {
+                            // _playerList = Send(GeneratePlayerList()).MessageId;
+                            PlayersChooseCard();
+                            if (Phase == GamePhase.Ending)
+                                break;
+                            // NextPlayer();
+                        }
+                        EndGame();
+                        #endregion
+                    }
+                    this.Phase = GamePhase.Ending;
+                    Bot.Send(ChatId, GetTranslation("GameEnded"));
+                }
+                catch (Exception ex)
+                {
+                    if (Phase == GamePhase.KillGame)
+                    {
+                        // normal
+                    } 
+                    else
+                    {
+                        ex.LogError();
+                    }
+                }
             }
 
             Bot.RemoveGame(this);
@@ -933,6 +946,7 @@ namespace SixNimmtBot
                     break;
                 case "killgame":
                     Send(GetTranslation("KillGame"));
+                    Phase = GamePhase.KillGame;
                     break;
                 case "extend":
                     if (Phase == GamePhase.Joining)
@@ -1087,7 +1101,7 @@ namespace SixNimmtBot
 
         public enum GamePhase
         {
-            Joining, InGame, Ending
+            Joining, InGame, Ending, KillGame
         }
 
         #endregion
