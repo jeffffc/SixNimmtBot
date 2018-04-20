@@ -629,6 +629,7 @@ namespace SixNimmtBot
                             Send(msg);
                             Array.Clear(thisRow, 0, thisRow.Length);
                             thisRow[0] = card;
+                            card.PlayedBy.SixNimmt = true;
                         }
                         else
                         {
