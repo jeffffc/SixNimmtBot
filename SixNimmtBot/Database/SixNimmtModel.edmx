@@ -47,6 +47,7 @@ warning 6002: The table/view 'sixnimmt.dbo.Admin' does not have a primary key de
           <Property Name="GroupLink" Type="nvarchar(max)" />
           <Property Name="CreatedTime" Type="datetime" />
           <Property Name="UseSticker" Type="bit" />
+          <Property Name="DynamicDeck" Type="bit" />
         </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
@@ -177,6 +178,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Name="CreatedTime" Type="DateTime" Precision="3" />
           <Property Name="UseSticker" Type="Boolean" />
           <NavigationProperty Name="Games" Relationship="sixnimmtModel.FK_Game_Group" FromRole="Group" ToRole="Game" />
+          <Property Name="DynamicDeck" Type="Boolean" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -306,6 +308,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <EntitySetMapping Name="Groups">
             <EntityTypeMapping TypeName="sixnimmtModel.Group">
               <MappingFragment StoreEntitySet="Group">
+                <ScalarProperty Name="DynamicDeck" ColumnName="DynamicDeck" />
                 <ScalarProperty Name="UseSticker" ColumnName="UseSticker" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />

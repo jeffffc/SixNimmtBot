@@ -44,6 +44,7 @@ namespace SixNimmtBot
         public Database.Game DbGame;
         public int Round = 1;
         public InlineKeyboardMarkup BotMarkup;
+        public bool UseDynamicDeck = false;
         
 
         public Locale Locale;
@@ -63,6 +64,7 @@ namespace SixNimmtBot
                 DbGroup = db.Groups.FirstOrDefault(x => x.GroupId == ChatId);
                 UseSticker = DbGroup.UseSticker ?? false;
                 DbGroup.UserName = chatUsername;
+                UseDynamicDeck = DbGroup.DynamicDeck ?? false;
                 db.SaveChanges();
                 GroupLink = DbGroup.UserName != null ? $"https://t.me/{DbGroup.UserName}" : DbGroup.GroupLink ?? null;
                 if (GroupLink != null)
@@ -422,10 +424,11 @@ namespace SixNimmtBot
 
         public string TextToTable(List<SNCard[]> cards)
         {
-            var table = new CustomConsoleTable("C 1", "C 2", "C 3", "C 4", "C 5");
+            var table = new CustomConsoleTable("C 1", "C 2", "C 3", "C 4", "C 5", "  T");
             foreach (var row in cards)
             {
                 var tx = row.Select(x => x == null ? " " : x.Number.ToString().PadLeft(3, ' ')).ToList();
+                tx.Add(row.Where(x => x != null).Select(x => x.Bulls).Sum().ToString().PadLeft(3, ' '));
                 // tx.Add(row.Where(x => x != null).Sum(x => x.Bulls).ToString().PadLeft(2, '0'));
                 table.AddRow(tx.ToArray());
             }
@@ -578,24 +581,25 @@ namespace SixNimmtBot
                 int row3Diff = 0;
                 int row4Diff = 0;
 
+                var max = UseDynamicDeck == true ? Players.Count * 10 + 5 : 105;
                 foreach (var card in tempPile)
                 {
                     row1Diff = card.Number - TableCards[0].Last(x => x != null).Number;
-                    if (row1Diff < 0) row1Diff = 105;
+                    if (row1Diff < 0) row1Diff = max;
 
                     row2Diff = card.Number - TableCards[1].Last(x => x != null).Number;
-                    if (row2Diff < 0) row2Diff = 105;
+                    if (row2Diff < 0) row2Diff = max;
 
                     row3Diff = card.Number - TableCards[2].Last(x => x != null).Number;
-                    if (row3Diff < 0) row3Diff = 105;
+                    if (row3Diff < 0) row3Diff = max;
 
                     row4Diff = card.Number - TableCards[3].Last(x => x != null).Number;
-                    if (row4Diff < 0) row4Diff = 105;
+                    if (row4Diff < 0) row4Diff = max;
 
                     var msg = $"{GetTranslation("PlayedCard", card.PlayedBy.GetName(), card.Number)}\n";
 
                     // if its lower than all4 row's rightmost card
-                    if (new[] { row1Diff, row2Diff, row3Diff, row4Diff }.All(x => x == 105))
+                    if (new[] { row1Diff, row2Diff, row3Diff, row4Diff }.All(x => x == max))
                     {
                         /* OLD: PLAYER AUTO KEEP THE ROW WITH LOWEST BULLS
                         TableCards.Sort((x, y) => x.Where(z => z != null).Sum(z => z.Bulls).CompareTo(y.Where(z => z != null).Sum(z => z.Bulls)));
@@ -611,7 +615,7 @@ namespace SixNimmtBot
                         /* NEW: PLAYER CHOOSE WHICH ROW TO KEEP */
                         Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention())}", BotMarkup);
                         SendMenu(card.PlayedBy,
-                            GetTableCardsString() +
+                            TextToTable(TableCards) +
                             Environment.NewLine + Environment.NewLine +
                             GetTranslation("CardLowerThanAll", card.GetName()),
                             GenerateMenu(card.PlayedBy, TableCards));
@@ -693,14 +697,21 @@ namespace SixNimmtBot
         public void PrepareGame()
         {
             // create deck
-            CardDeck = new SNDeck();
+            if (UseDynamicDeck)
+                CardDeck = new SNDeck(Players.Count);
+            else
+                CardDeck = new SNDeck();
 
+            /*
+             * // Commented because it is moved to class initialzation
             for (int i = 1; i <= 104; i++)
             {
                 SNCard card = new SNCard(i);
                 CardDeck.Cards.Add(card);
             }
             CardDeck.Cards.Shuffle(10);
+            *
+            */
 
             // create table arrays
             for (int i = 0; i < 4; i++)

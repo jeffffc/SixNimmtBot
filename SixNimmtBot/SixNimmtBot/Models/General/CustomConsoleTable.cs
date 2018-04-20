@@ -170,8 +170,8 @@ namespace SixNimmtBot.Models.General
             var results = Rows.Select(row => string.Format(format, row)).ToList();
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
-            var dividerPlus = divider.Replace("|", "+");
+            var divider = Regex.Replace(columnHeaders, @"[^(|‖)]", "-");
+            var dividerPlus = divider.Replace("|", "+").Replace("‖", "+");
 
             builder.AppendLine(dividerPlus);
             builder.AppendLine(columnHeaders);
@@ -192,6 +192,8 @@ namespace SixNimmtBot.Models.General
             var format = (Enumerable.Range(0, Columns.Count)
                 .Select(i => delimiterStr + "{" + i + ",-" + columnLengths[i] + "}")
                 .Aggregate((s, a) => s + a) + delimiterStr).Trim();
+            var index = format.LastIndexOf(delimiter, format.LastIndexOf(delimiter) - 1);
+            format = format.Remove(index, 1).Insert(index, "‖");
             return format;
         }
 

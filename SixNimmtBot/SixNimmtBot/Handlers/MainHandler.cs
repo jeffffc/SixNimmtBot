@@ -182,5 +182,17 @@ namespace SixNimmtBot.Handlers
                 db.SaveChanges();
             }
         }
+
+        public static void SetCardDeckConfig(long chatId, bool useDynamic)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == chatId);
+                if (grp == null)
+                    return;
+                grp.DynamicDeck = useDynamic;
+                db.SaveChanges();
+            }
+        }
     }
 }

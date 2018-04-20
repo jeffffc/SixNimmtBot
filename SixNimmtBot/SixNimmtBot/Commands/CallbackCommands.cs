@@ -94,6 +94,27 @@ namespace SixNimmtBot
                     Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, toSend, menu);
                 }
             }
+            else if (temp[0] == "deck")
+            {
+                if (temp.Length == 2)
+                {
+                    var menu = Handler.GetConfigCardDeckMenu(chatId);
+                    // should be group only
+                    var group = Helpers.GetGroup(chatId);
+                    var current = group.DynamicDeck;
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId,
+                        GetTranslation("ConfigCardDeckDetail", GetLanguage(chatId),
+                        current == true ? GetTranslation("ConfigDynamicDeck", GetLanguage(chatId)) : GetTranslation("ConfigStaticDeck", GetLanguage(chatId))), menu);
+                }
+                if (temp.Length > 2)
+                {
+                    var chosen = temp[2] == "dynamic";
+                    Handler.SetCardDeckConfig(chatId, chosen);
+                    var menu = Handler.GetConfigMenu(chatId);
+                    var toSend = GetTranslation("ReceivedButton", GetLanguage(chatId)) + Environment.NewLine + GetTranslation("WhatToDo", GetLanguage(chatId));
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, toSend, menu);
+                }
+            }
             else if (temp[0] == "done")
             {
                 Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ConfigDone", GetLanguage(chatId)));

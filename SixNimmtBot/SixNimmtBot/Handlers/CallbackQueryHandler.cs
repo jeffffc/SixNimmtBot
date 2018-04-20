@@ -72,6 +72,11 @@ namespace SixNimmtBot.Handlers
             //base menu
             buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigChangeLanguage", GetLanguage(id)), $"config|lang|{id}"));
             buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigTableCard", GetLanguage(id)), $"config|table|{id}"));
+            // for group only
+            if (id < 0)
+            {
+                buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigCardDeck", GetLanguage(id)), $"config|deck|{id}"));
+            }
             buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigDone", GetLanguage(id)), $"config|done|{id}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
@@ -161,6 +166,23 @@ namespace SixNimmtBot.Handlers
                 i++;
             }
             twoMenu.Add(new[] { new InlineKeyboardCallbackButton("Cancel", $"getlang|cancel") });
+
+            var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
+            return menu;
+        }
+
+        public static InlineKeyboardMarkup GetConfigCardDeckMenu(long id)
+        {
+            List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton> { };
+            //base menu
+            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigStaticDeck", GetLanguage(id)), $"config|deck|{id}|static"));
+            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigDynamicDeck", GetLanguage(id)), $"config|deck|{id}|dynamic"));
+            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}"));
+            var twoMenu = new List<InlineKeyboardButton[]>();
+            for (var i = 0; i < buttons.Count; i++)
+            {
+                twoMenu.Add(new[] { buttons[i] });
+            }
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;

@@ -114,7 +114,7 @@ namespace SixNimmtBot
                 Console.WriteLine(msg);
 
                 var table = new ConsoleTables.ConsoleTable("Game GUID", "ChatId", "Phase", "# of Players");
-                foreach (SixNimmt game in games)
+                foreach (SixNimmt game in games.ToArray())
                 {
                     if (game.Phase == SixNimmt.GamePhase.KillGame)
                     {
