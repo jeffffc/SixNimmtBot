@@ -63,7 +63,7 @@ namespace SixNimmtBot
                 if (temp.Length == 2)
                 {
                     var menu = Handler.GetConfigLangMenu(chatId);
-                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ChooseLanguage", GetLanguage(chatId)), menu);
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation(chatId > 0 ? "ChoosePMLanguage" : "ChooseLanguage", GetLanguage(chatId)), menu);
                 }
                 if (temp.Length > 2)
                 {
