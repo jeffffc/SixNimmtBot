@@ -329,7 +329,7 @@ namespace SixNimmtBot
         {
             if (!String.IsNullOrEmpty(msg.Chat.Username))
             {
-                msg.Reply(GetTranslation("SetLinkDone", GetLanguage(msg.Chat.Id), "https://t.me/{msg.Chat.Username"));
+                msg.Reply(GetTranslation("SetLinkDone", GetLanguage(msg.Chat.Id), $"https://t.me/{msg.Chat.Username}"));
                 return;
             }
 
