@@ -188,7 +188,7 @@ namespace SixNimmtBot
                             return;
                         }
 
-                        Bot.Send(ChatId, GetTranslation("GameStart"));
+                        Bot.Send(ChatId, GetTranslation("GameStart", UseDynamicDeck == true ? "ConfigDynamicDeck" : "ConfigStaticDeck"));
 
                         // create game + gameplayers in db
                         using (var db = new SixNimmtDb())
