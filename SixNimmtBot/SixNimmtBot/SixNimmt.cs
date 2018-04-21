@@ -29,7 +29,7 @@ namespace SixNimmtBot
         public int GameId;
         public string GroupLink;
         public DateTime TimeCreated;
-        public InlineKeyboardMarkup GroupMarkup;
+        public InlineKeyboardMarkup GroupMarkup = null;
         public Group DbGroup;
         public List<SNPlayer> Players = new List<SNPlayer>();
         public List<SNCard[]> TableCards = new List<SNCard[]>();
@@ -1001,8 +1001,8 @@ namespace SixNimmtBot
                             var myCards = GetPlayerKeptCards(p);
                             toSend += $"\n\n{GetTranslation("KeptCards")}\n{myCards}";
                         }
-                        SendPM(p, toSend);
-                        msg.Reply(GetTranslation("SentPM"));
+                        SendPM(p, toSend, GroupMarkup);
+                        msg.Reply(GetTranslation("SentPM"), BotMarkup);
 
                         /*
                          * // commented because people want to see their unused card too

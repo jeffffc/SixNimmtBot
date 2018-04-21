@@ -125,5 +125,30 @@ namespace SixNimmtBot
             }
             return;
         }
+
+        [Callback(Trigger = "getlang")]
+        public static void GetLang(CallbackQuery query, string[] args)
+        {
+            var temp = args[1].Split('|');
+
+            if (temp.Length == 1)
+            {
+                if (temp[0] == "cancel")
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ConfigDone", GetLanguage(query.Message.Chat.Id)));
+            }
+            if (temp.Length > 1)
+            {
+                if (temp[0] == "get")
+                {
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ConfigDone", GetLanguage(query.Message.Chat.Id), temp[1]));
+                    var lang = temp[1] + ".xml";
+                    using (var sr = new StreamReader(Path.Combine(Constants.GetLangDirectory(), lang)))
+                    {
+                        var file = new FileToSend(lang, sr.BaseStream);
+                        BotMethods.SendDocument(query.Message.Chat.Id, file);
+                    }
+                }
+            }
+        }
     }
 }
