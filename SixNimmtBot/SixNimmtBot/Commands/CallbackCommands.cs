@@ -81,8 +81,8 @@ namespace SixNimmtBot
                     var menu = Handler.GetConfigTableMenu(chatId);
                     var groupOrPlayer = Helpers.GetGroupOrPlayer(chatId);
                     var current = groupOrPlayer.UseSticker;
-                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, 
-                        GetTranslation("ChooseTable", GetLanguage(chatId), 
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId,
+                        GetTranslation("ChooseTable", GetLanguage(chatId),
                         current == true ? GetTranslation("ChooseUseSticker", GetLanguage(chatId)) : GetTranslation("ChooseUseText", GetLanguage(chatId))), menu);
                 }
                 if (temp.Length > 2)
@@ -113,6 +113,27 @@ namespace SixNimmtBot
                     var menu = Handler.GetConfigMenu(chatId);
                     var toSend = GetTranslation("ReceivedButton", GetLanguage(chatId)) + Environment.NewLine + GetTranslation("WhatToDo", GetLanguage(chatId));
                     Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, toSend, menu);
+                }
+            }
+            else if (temp[0] == "choosetime")
+            {
+                if (temp.Length == 2)
+                {
+                    var menu = Handler.GetConfigChooseCardTimeMenu(chatId);
+                    // should be group only
+                    var group = Helpers.GetGroup(chatId);
+                    var current = group.ChooseCardTime ?? Constants.ChooseCardTime;
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId,
+                        GetTranslation("ConfigChooseCardTimeDetail", GetLanguage(chatId), current), menu);
+                }
+                if (temp.Length > 2)
+                {
+                    var chosen = int.Parse(temp[2]);
+                    Handler.SetChooseCardTimeConfig(chatId, chosen);
+                    var menu = Handler.GetConfigMenu(chatId);
+                    var toSend = GetTranslation("ReceivedButton", GetLanguage(chatId)) + Environment.NewLine + GetTranslation("WhatToDo", GetLanguage(chatId));
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, toSend, menu);
+
                 }
             }
             else if (temp[0] == "done")

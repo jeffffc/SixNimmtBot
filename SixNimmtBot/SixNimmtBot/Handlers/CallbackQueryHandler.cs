@@ -76,6 +76,7 @@ namespace SixNimmtBot.Handlers
             if (id < 0)
             {
                 buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigCardDeck", GetLanguage(id)), $"config|deck|{id}"));
+                buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigChooseCardTime", GetLanguage(id)), $"config|choosetime|{id}"));
             }
             buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigDone", GetLanguage(id)), $"config|done|{id}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
@@ -183,6 +184,31 @@ namespace SixNimmtBot.Handlers
             {
                 twoMenu.Add(new[] { buttons[i] });
             }
+
+            var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
+            return menu;
+        }
+
+        public static InlineKeyboardMarkup GetConfigChooseCardTimeMenu(long id)
+        {
+            List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton> { };
+            var times = new string[] { "30", "45", "60", "75", "90" };
+            //base menu
+            foreach (var t in times)
+                buttons.Add(new InlineKeyboardCallbackButton(t, $"config|choosetime|{id}|{t}"));
+
+            var twoMenu = new List<InlineKeyboardButton[]>();
+            for (var i = 0; i < buttons.Count; i++)
+            {
+                if (buttons.Count - 1 == i)
+                {
+                    twoMenu.Add(new[] { buttons[i] });
+                }
+                else
+                    twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
+                i++;
+            }
+            twoMenu.Add(new[] { new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;

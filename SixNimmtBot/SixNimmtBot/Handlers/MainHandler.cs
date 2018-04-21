@@ -194,5 +194,17 @@ namespace SixNimmtBot.Handlers
                 db.SaveChanges();
             }
         }
+
+        public static void SetChooseCardTimeConfig(long chatId, int chooseCardTime)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == chatId);
+                if (grp == null)
+                    return;
+                grp.ChooseCardTime = chooseCardTime;
+                db.SaveChanges();
+            }
+        }
     }
 }
