@@ -271,7 +271,7 @@ namespace SixNimmtBot
             string uptime = $"{(DateTime.Now - Program.Startup):dd\\.hh\\:mm\\:ss\\.ff}";
             int gamecount = Bot.Games.Count;
             int playercount = Bot.Games.Select(x => x.Players.Count).Sum();
-            Bot.Send(msg.Chat.Id, $"Version: {version.ToString().ToCode()}\nBuild Date: {buildDate.ToCode()}\nUptime: {uptime.ToCode()}\n$Game count: {gamecount.ToString().ToCode()}\nPlayer count: {playercount.ToString().ToCode()}");
+            Bot.Send(msg.Chat.Id, $"Version: {version.ToString().ToCode()}\nBuild Date: {buildDate.ToCode()}\nUptime: {uptime.ToCode()}\nGame count: {gamecount.ToString().ToCode()}\nPlayer count: {playercount.ToString().ToCode()}");
         }
 
         [Attributes.Command(Trigger = "stats")]
