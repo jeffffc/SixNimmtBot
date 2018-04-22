@@ -14,6 +14,7 @@ namespace SixNimmtBot.Handlers
     {
         public static void HandleMessage(Message msg)
         {
+            if (msg.Date.ToUniversalTime() < Program.Startup.ToUniversalTime()) return;
             switch (msg.Type)
             {
                 case MessageType.TextMessage:

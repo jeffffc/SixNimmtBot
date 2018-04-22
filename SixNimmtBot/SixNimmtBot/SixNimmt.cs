@@ -188,7 +188,11 @@ namespace SixNimmtBot
                             return;
                         }
 
-                        Bot.Send(ChatId, GetTranslation("GameStart", UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck")));
+                        Bot.Send(ChatId, 
+                            GetTranslation("GameStart", 
+                            UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck"),
+                            UseDynamicDeck == true ? GetTranslation("DynamicExplanation", Players.Count * 10 + 4) : GetTranslation("StaticExplanation")
+                            ));
 
                         // create game + gameplayers in db
                         using (var db = new SixNimmtDb())
@@ -932,7 +936,7 @@ namespace SixNimmtBot
                 var cardRow = tableCards[i];
                 var rowBullsCount = cardRow.Where(x => x != null).Sum(x => x.Bulls);
                 var label = $"Row {i + 1}: {rowBullsCount} 🐮";
-                buttons.Add(new Tuple<string, string>(label, $"{this.Id}|{p.TelegramId}|row|{i}"));
+                buttons.Add(new Tuple<string, string>(label, $"game|{this.Id}|{p.TelegramId}|row|{i}"));
             }
             var row = new List<InlineKeyboardButton>();
             var rows = new List<InlineKeyboardButton[]>();
