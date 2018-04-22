@@ -87,7 +87,7 @@ namespace SixNimmtBot
             // something
             #endregion
 
-            var msg = GetTranslation("NewGame", u.GetName());
+            var msg = GetTranslation("NewGame", u.GetName(), UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck"));
             // beta message
             msg += Environment.NewLine + Environment.NewLine + GetTranslation("Beta");
             Bot.Send(chatId, msg);
@@ -188,7 +188,7 @@ namespace SixNimmtBot
                             return;
                         }
 
-                        Bot.Send(ChatId, GetTranslation("GameStart", UseDynamicDeck == true ? "ConfigDynamicDeck" : "ConfigStaticDeck"));
+                        Bot.Send(ChatId, GetTranslation("GameStart", UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck")));
 
                         // create game + gameplayers in db
                         using (var db = new SixNimmtDb())
