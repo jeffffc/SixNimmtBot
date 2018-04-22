@@ -264,10 +264,14 @@ namespace SixNimmtBot
         [Attributes.Command(Trigger = "runinfo")]
         public static void RunInfo(Message msg, string[] args)
         {
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            string buildDate = new DateTime(2000, 1, 1).Add(new TimeSpan(
+                TimeSpan.TicksPerDay * version.Build + // days since 1 January 2000
+                TimeSpan.TicksPerSecond * 2 * version.Revision)).ToString();
             string uptime = $"{(DateTime.Now - Program.Startup):dd\\.hh\\:mm\\:ss\\.ff}";
             int gamecount = Bot.Games.Count;
             int playercount = Bot.Games.Select(x => x.Players.Count).Sum();
-            Bot.Send(msg.Chat.Id, GetTranslation("Runinfo", GetLanguage(msg.Chat.Id), uptime, gamecount, playercount));
+            Bot.Send(msg.Chat.Id, $"Version: {version.ToString().ToCode()}\nBuild Date: {buildDate.ToCode()}\nUptime: {uptime.ToCode()}\n$Game count: {gamecount.ToString().ToCode()}\nPlayer count: {playercount.ToString().ToCode()}");
         }
 
         [Attributes.Command(Trigger = "stats")]
