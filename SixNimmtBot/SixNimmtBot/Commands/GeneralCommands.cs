@@ -369,7 +369,6 @@ namespace SixNimmtBot
                 grp.GroupLink = null;
                 db.SaveChanges();
             }
-
             msg.Reply(GetTranslation("LinkRemoved", GetLanguage(msg.Chat.Id)));
         }
     }
