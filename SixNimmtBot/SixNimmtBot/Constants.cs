@@ -43,7 +43,7 @@ namespace SixNimmtBot
 
 #if DEBUG
         public static int MinPlayer = 2;
-        public static int NumOfRounds = 3;
+        public static int NumOfRounds = 5;
 #else
         public static int MinPlayer = 3;
         public static int NumOfRounds = 10;

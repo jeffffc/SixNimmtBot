@@ -807,6 +807,25 @@ namespace SixNimmtBot
                 p.AFKPenalties = Math.Max(p.AFKTimes - 2, 0) * 3;
                 p.FinalScore = p.Score + p.AFKPenalties;
             }
+            var finalPlayersGrouped = Players.GroupBy(x => x.FinalScore).OrderByDescending(x => x.Key).ToList();
+            foreach (var score in finalPlayersGrouped)
+            {
+                var thisScoreMsg = "";
+                foreach (var p in score)
+                {
+                    if (p.AFKPenalties > 0)
+                        thisScoreMsg += GetTranslation("PlayerBullWithAFK", p.GetMention(), p.AFKPenalties, p.Score, p.FinalScore);
+                    else
+                        thisScoreMsg += GetTranslation("PlayerBull", p.GetMention(), p.Score);
+                    thisScoreMsg += Environment.NewLine;
+                }
+                Send(thisScoreMsg);
+                Thread.Sleep(3000);
+            }
+
+            var wonPlayers = finalPlayersGrouped.Last().ToList();
+            Send($"{wonPlayers.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
+            /*
             var finalPlayers = Players.OrderByDescending(x => x.FinalScore);
             foreach (var p in finalPlayers)
             {
@@ -818,6 +837,7 @@ namespace SixNimmtBot
             }
             var wonPlayers = Players.Where(x => x.Score == finalPlayers.Last().Score).ToList();
             Send($"{wonPlayers.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
+            */
 
             // DB
             using (var db = new SixNimmtDb())
