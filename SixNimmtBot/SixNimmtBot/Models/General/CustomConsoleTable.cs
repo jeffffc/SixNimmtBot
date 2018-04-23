@@ -164,7 +164,7 @@ namespace SixNimmtBot.Models.General
             var format = Format(columnLengths);
 
             // find the longest formatted line
-            var columnHeaders = string.Format(format, Columns.ToArray());
+            var columnHeaders = string.Format(format, Columns.ToArray()).Replace("|", "+");
 
             // add each row
             var results = Rows.Select(row => string.Format(format, row)).ToList();
@@ -173,15 +173,16 @@ namespace SixNimmtBot.Models.General
             var divider = Regex.Replace(columnHeaders, @"[^(|‖)]", "-");
             var dividerPlus = divider.Replace("|", "+").Replace("‖", "+");
 
-            builder.AppendLine(dividerPlus);
+            // builder.AppendLine(dividerPlus);
             builder.AppendLine(columnHeaders);
 
             foreach (var row in results)
             {
-                builder.AppendLine(dividerPlus);
+                // builder.AppendLine(dividerPlus);
                 builder.AppendLine(row);
             }
-            builder.AppendLine(dividerPlus);
+            // builder.AppendLine(dividerPlus);
+            builder.AppendLine(columnHeaders);
 
             return builder.ToString();
         }
@@ -191,8 +192,9 @@ namespace SixNimmtBot.Models.General
             var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
             var format = (Enumerable.Range(0, Columns.Count)
                 .Select(i => delimiterStr + "{" + i + ",-" + columnLengths[i] + "}")
-                .Aggregate((s, a) => s + a) + delimiterStr).Trim();
-            var index = format.LastIndexOf(delimiter, format.LastIndexOf(delimiter) - 1);
+                .Aggregate((s, a) => s + a)).Trim();
+            // var index = format.LastIndexOf(delimiter, format.LastIndexOf(delimiter) - 1);
+            var index = format.LastIndexOf(delimiter);
             format = format.Remove(index, 1).Insert(index, "‖");
             return format;
         }

@@ -249,7 +249,7 @@ namespace SixNimmtBot
                         catch (Exception e)
                         {
                             Phase = GamePhase.KillGame;
-                            e.LogError();
+                            Log(e);
                             return;
                         }
                     }
@@ -264,7 +264,7 @@ namespace SixNimmtBot
                     } 
                     else
                     {
-                        ex.LogError();
+                        Log(ex);
                         Phase = GamePhase.KillGame;
                     }
                 }
@@ -438,11 +438,11 @@ namespace SixNimmtBot
 
         public string TextToTable(List<SNCard[]> cards)
         {
-            var table = new CustomConsoleTable("C 1", "C 2", "C 3", "C 4", "C 5", "  T");
+            var table = new CustomConsoleTable("---", "---", "---", "---", "---", "🐮");
             foreach (var row in cards)
             {
                 var tx = row.Select(x => x == null ? " " : x.Number.ToString().PadLeft(3, ' ')).ToList();
-                tx.Add(row.Where(x => x != null).Select(x => x.Bulls).Sum().ToString().PadLeft(3, ' '));
+                tx.Add(row.Where(x => x != null).Select(x => x.Bulls).Sum().ToString().PadLeft(2, ' '));
                 // tx.Add(row.Where(x => x != null).Sum(x => x.Bulls).ToString().PadLeft(2, '0'));
                 table.AddRow(tx.ToArray());
             }
