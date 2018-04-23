@@ -561,11 +561,13 @@ namespace SixNimmtBot
                 }
 
                 // announce AFK
-                if (Players.Any(x => x.AFKTimes == 2))
+                if (Players.Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
                 {
                     Thread.Sleep(2000);
                     var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                     Send(GetTranslation("AFK2Times", afkPlayers));
+                    foreach (var p in Players.Where(x => x.AFKTimes == 2))
+                        p.AFKNotified = true;
                     Thread.Sleep(4000);
                 }
 
@@ -650,11 +652,13 @@ namespace SixNimmtBot
                             card.PlayedBy.AFKTimes++;
                         }
 
-                        if (Players.Any(x => x.AFKTimes == 2))
+                        if (Players.Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
                         {
                             Thread.Sleep(2000);
                             var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                             Send(GetTranslation("AFK2Times", afkPlayers));
+                            foreach (var p in Players.Where(x => x.AFKTimes == 2))
+                                p.AFKNotified = true;
                             Thread.Sleep(2000);
                         }
 

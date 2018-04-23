@@ -20,6 +20,7 @@ namespace SixNimmtBot.Models.Game
         public int AFKTimes { get; set; } = 0;
         public int AFKPenalties { get; set; } = 0;
         public int FinalScore { get; set; } = 0;
+        public bool AFKNotified { get; set; } = false;
 
         // achv
         public bool SixNimmt { get; set; } = false;
