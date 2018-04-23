@@ -45,6 +45,9 @@ namespace SixNimmtBot
         public int Round = 1;
         public InlineKeyboardMarkup BotMarkup;
         public bool UseDynamicDeck = false;
+
+        public bool PauseSendingTableText = false;
+        public string ToSend = "";
         
 
         public Locale Locale;
@@ -590,7 +593,9 @@ namespace SixNimmtBot
                     tempPile.Sort((x, y) => x.Number.CompareTo(y.Number));
                 }
 
-                Send($"{GetTranslation("CardsPlayed")}\n{tempPile.Select(x => x.Number.ToString()).Aggregate((x, y) => x + " " + y)}");
+                // Send($"{GetTranslation("CardsPlayed")}\n{tempPile.Select(x => x.Number.ToString()).Aggregate((x, y) => x + " " + y)}");
+                // don't show all cards yet
+                Send(GetTranslation("CardsPlayed"));
                 Thread.Sleep(6000);
 
                 int row1Diff = 0;
@@ -878,6 +883,13 @@ namespace SixNimmtBot
         public Message Send(string msg, InlineKeyboardMarkup markup = null)
         {
             return Bot.Send(ChatId, msg, markup);
+        }
+
+        public void SendQueued()
+        {
+            if (!String.IsNullOrWhiteSpace(ToSend))
+                Send(ToSend);
+            ToSend = "";
         }
 
         public Message SendPM(SNPlayer p, string msg, InlineKeyboardMarkup markup = null)
