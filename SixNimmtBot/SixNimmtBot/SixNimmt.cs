@@ -565,7 +565,8 @@ namespace SixNimmtBot
                 {
                     Thread.Sleep(2000);
                     var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
-                    Thread.Sleep(2000);
+                    Send(GetTranslation("AFK2Times", afkPlayers));
+                    Thread.Sleep(4000);
                 }
 
                 // move chosen card from hand to the pile
@@ -646,6 +647,15 @@ namespace SixNimmtBot
                             card.PlayedBy.Choice = -1;
                             Bot.Edit(card.PlayedBy.TelegramId, card.PlayedBy.CurrentQuestion.MessageId, GetTranslation("TimesUpButton"));
                             card.PlayedBy.CurrentQuestion = null;
+                            card.PlayedBy.AFKTimes++;
+                        }
+
+                        if (Players.Any(x => x.AFKTimes == 2))
+                        {
+                            Thread.Sleep(2000);
+                            var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
+                            Send(GetTranslation("AFK2Times", afkPlayers));
+                            Thread.Sleep(2000);
                         }
 
                         var rowChosen = card.PlayedBy.Choice == -1 ? TableCards.Random() : TableCards[(int)card.PlayedBy.Choice];
@@ -712,7 +722,7 @@ namespace SixNimmtBot
         {
             // create deck
             if (UseDynamicDeck)
-                CardDeck = new SNDeck(Players.Count);
+                CardDeck = new SNDeck(Players.Count, true);
             else
                 CardDeck = new SNDeck();
 

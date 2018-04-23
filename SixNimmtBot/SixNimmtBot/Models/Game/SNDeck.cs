@@ -20,12 +20,26 @@ namespace SixNimmtBot.Models.Game
             Cards.Shuffle(10);
         }
 
-        public SNDeck(int numOfPlayers)
+        public SNDeck(int numOfPlayers, bool random = false)
         {
-            for (int i = 1; i <= (numOfPlayers * 10 + 4); i++)
+            if (!random)
             {
-                SNCard card = new SNCard(i);
-                Cards.Add(card);
+                for (int i = 1; i <= (numOfPlayers * 10 + 4); i++)
+                {
+                    SNCard card = new SNCard(i);
+                    Cards.Add(card);
+                }
+            }
+            else
+            {
+                var temp = new List<SNCard>();
+                for (int i = 1; i <= 104; i++)
+                {
+                    SNCard card = new SNCard(i);
+                    temp.Add(card);
+                }
+                temp.Shuffle(5);
+                Cards.AddRange(temp.Take(numOfPlayers * 10 + 4));
             }
             Cards.Shuffle(10);
         }
