@@ -181,68 +181,77 @@ namespace SixNimmtBot
                     }
                     else
                     {
-                        #region Ready to start game
-                        if (Players.Count < Constants.MinPlayer)
+                        try
                         {
-                            Send(GetTranslation("GameEnded"));
+                            #region Ready to start game
+                            if (Players.Count < Constants.MinPlayer)
+                            {
+                                Send(GetTranslation("GameEnded"));
+                                return;
+                            }
+
+                            Bot.Send(ChatId,
+                                GetTranslation("GameStart",
+                                UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck"),
+                                UseDynamicDeck == true ? GetTranslation("DynamicExplanation", Players.Count * 10 + 4) : GetTranslation("StaticExplanation")
+                                ));
+
+                            // create game + gameplayers in db
+                            using (var db = new SixNimmtDb())
+                            {
+                                DbGame = new Database.Game
+                                {
+                                    GrpId = DbGroup.Id,
+                                    GroupId = ChatId,
+                                    GroupName = GroupName,
+                                    TimeStarted = DateTime.UtcNow
+                                };
+                                db.Games.Add(DbGame);
+                                db.SaveChanges();
+                                GameId = DbGame.Id;
+                                foreach (var p in Players)
+                                {
+                                    GamePlayer DbGamePlayer = new GamePlayer
+                                    {
+                                        PlayerId = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId).Id,
+                                        GameId = GameId
+                                    };
+                                    db.GamePlayers.Add(DbGamePlayer);
+                                }
+                                db.SaveChanges();
+                            }
+
+                            PrepareGame();
+                            SortTableCards();
+
+                            // remove joined players from nextgame list
+                            // RemoveFromNextGame(Players.Select(x => x.TelegramId).ToList());
+
+                            #endregion
+
+                            #region Start!
+                            SendTableCards();
+                            foreach (var player in Players)
+                            {
+                                SendPM(player, $"{GetTranslation("CardsInHand")}\n{GetPlayerCards(player.CardsInHand)}");
+                            }
+                            while (Phase != GamePhase.Ending)
+                            {
+                                // _playerList = Send(GeneratePlayerList()).MessageId;
+                                PlayersChooseCard();
+                                if (Phase == GamePhase.Ending)
+                                    break;
+                                // NextPlayer();
+                            }
+                            EndGame();
+                            #endregion
+                        }
+                        catch (Exception e)
+                        {
+                            Phase = GamePhase.KillGame;
+                            e.LogError();
                             return;
                         }
-
-                        Bot.Send(ChatId, 
-                            GetTranslation("GameStart", 
-                            UseDynamicDeck == true ? GetTranslation("ConfigDynamicDeck") : GetTranslation("ConfigStaticDeck"),
-                            UseDynamicDeck == true ? GetTranslation("DynamicExplanation", Players.Count * 10 + 4) : GetTranslation("StaticExplanation")
-                            ));
-
-                        // create game + gameplayers in db
-                        using (var db = new SixNimmtDb())
-                        {
-                            DbGame = new Database.Game
-                            {
-                                GrpId = DbGroup.Id,
-                                GroupId = ChatId,
-                                GroupName = GroupName,
-                                TimeStarted = DateTime.UtcNow
-                            };
-                            db.Games.Add(DbGame);
-                            db.SaveChanges();
-                            GameId = DbGame.Id;
-                            foreach (var p in Players)
-                            {
-                                GamePlayer DbGamePlayer = new GamePlayer
-                                {
-                                    PlayerId = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId).Id,
-                                    GameId = GameId
-                                };
-                                db.GamePlayers.Add(DbGamePlayer);
-                            }
-                            db.SaveChanges();
-                        }
-
-                        PrepareGame();
-                        SortTableCards();
-
-                        // remove joined players from nextgame list
-                        // RemoveFromNextGame(Players.Select(x => x.TelegramId).ToList());
-
-                        #endregion
-
-                        #region Start!
-                        SendTableCards();
-                        foreach (var player in Players)
-                        {
-                            SendPM(player, $"{GetTranslation("CardsInHand")}\n{GetPlayerCards(player.CardsInHand)}");
-                        }
-                        while (Phase != GamePhase.Ending)
-                        {
-                            // _playerList = Send(GeneratePlayerList()).MessageId;
-                            PlayersChooseCard();
-                            if (Phase == GamePhase.Ending)
-                                break;
-                            // NextPlayer();
-                        }
-                        EndGame();
-                        #endregion
                     }
                     this.Phase = GamePhase.Ending;
                     Bot.Send(ChatId, GetTranslation("GameEnded"));
