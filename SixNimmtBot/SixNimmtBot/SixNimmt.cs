@@ -726,7 +726,7 @@ namespace SixNimmtBot
         {
             // create deck
             if (UseDynamicDeck)
-                CardDeck = new SNDeck(Players.Count, true);
+                CardDeck = new SNDeck(Players.Count);
             else
                 CardDeck = new SNDeck();
 
