@@ -20,6 +20,7 @@ namespace SixNimmtBot.Models.General
         Professional = 8, //Win 100 games
         ThirtySixNimmt = 16, // Get 36 Bulls
         ZeroNimmt = 32, // No Bulls at all
+        HeyCorgi = 64, // Play with Jeff
     } // MAX VALUE: 9223372036854775807
       //            
 
