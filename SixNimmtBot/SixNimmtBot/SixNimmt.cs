@@ -265,6 +265,7 @@ namespace SixNimmtBot
                     else
                     {
                         ex.LogError();
+                        Phase = GamePhase.KillGame;
                     }
                 }
             }
