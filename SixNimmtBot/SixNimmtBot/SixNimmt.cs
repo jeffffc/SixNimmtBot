@@ -46,7 +46,7 @@ namespace SixNimmtBot
         public InlineKeyboardMarkup BotMarkup;
         public bool UseDynamicDeck = false;
 
-        public bool PauseSendingTableText = false;
+        public bool PauseSendingTableCards = false;
         public string ToSend = "";
         
 
@@ -389,13 +389,14 @@ namespace SixNimmtBot
 
         public void SendTableCards()
         {
+            if (PauseSendingTableCards) return;
             // Send(GetTableCardsString());
             if (!UseSticker)
                 Send(TextToTable(TableCards));
             // Bot.Api.SendPhotoAsync(ChatId, GetTableCardsImage(TableCards)).Wait();
             else
                 CurrentTableStickerId = Bot.SendSticker(ChatId, GetTableCardsImage(TableCards)).Sticker.FileId;
-            
+            PauseSendingTableCards = false;
         }
 
         public FileToSend GetTableCardsImage(List<SNCard[]> cards)
@@ -606,6 +607,9 @@ namespace SixNimmtBot
                 var max = UseDynamicDeck == true ? Players.Count * 10 + 5 : 105;
                 foreach (var card in tempPile)
                 {
+                    if (tempPile.IndexOf(card) > 0)
+                        SendTableCards();
+                    Thread.Sleep(3000);
                     row1Diff = card.Number - TableCards[0].Last(x => x != null).Number;
                     if (row1Diff < 0) row1Diff = max;
 
@@ -618,7 +622,7 @@ namespace SixNimmtBot
                     row4Diff = card.Number - TableCards[3].Last(x => x != null).Number;
                     if (row4Diff < 0) row4Diff = max;
 
-                    var msg = $"{GetTranslation("PlayedCard", card.PlayedBy.GetName(), card.Number)}\n";
+                    var msg = $"{GetTranslation("PlayedCard", card.PlayedBy.GetName(), card.GetName())}\n";
 
                     // if its lower than all4 row's rightmost card
                     if (new[] { row1Diff, row2Diff, row3Diff, row4Diff }.All(x => x == max))
@@ -639,7 +643,7 @@ namespace SixNimmtBot
                         SendMenu(card.PlayedBy,
                             TextToTable(TableCards) +
                             Environment.NewLine + Environment.NewLine +
-                            GetTranslation("CardLowerThanAll", card.GetName()),
+                            GetTranslation("CardLowerThanAllPM", card.GetName()),
                             GenerateMenu(card.PlayedBy, TableCards));
                         for (int i = 0; i < Constants.ChooseCardTime; i++)
                         {
@@ -667,13 +671,27 @@ namespace SixNimmtBot
                             Thread.Sleep(2000);
                         }
 
-                        var rowChosen = card.PlayedBy.Choice == -1 ? TableCards.Random() : TableCards[(int)card.PlayedBy.Choice];
+                        int rowChosenNum = 0;
+                        SNCard[] rowChosen;
+                        if (card.PlayedBy.Choice == -1)
+                        {
+                            rowChosen = TableCards.Random();
+                            rowChosenNum = TableCards.IndexOf(rowChosen) + 1;
+                        }
+                        else
+                        {
+                            rowChosen = TableCards[(int)card.PlayedBy.Choice];
+                            rowChosenNum = (int)card.PlayedBy.Choice + 1;
+                        }
+                        // var rowChosenNum = card.PlayedBy.Choice == -1 ? TableCards.Random()
+                        // var rowChosen = card.PlayedBy.Choice == -1 ? TableCards.Random() : TableCards[(int)card.PlayedBy.Choice];
                         card.PlayedBy.KeptCards.AddRange(rowChosen.Where(x => x != null));
-                        msg = $"{GetTranslation("KeptRow", card.PlayedBy.GetName())}\n" + GetBullsTotalString(rowChosen);
+                        msg = $"{GetTranslation("KeptRow", card.PlayedBy.GetName(), rowChosenNum)}\n" + GetBullsTotalString(rowChosen);
                         Send(msg);
                         Array.Clear(rowChosen, 0, rowChosen.Length);
                         rowChosen[0] = card;
                         card.PlayedBy.Choice = null;
+                        PauseSendingTableCards = false;
                         Thread.Sleep(2000);
                     }
                     else
@@ -695,6 +713,8 @@ namespace SixNimmtBot
                         // if this row is full already
                         if (thisRow.Count(x => x != null) == 5)
                         {
+                            PauseSendingTableCards = false;
+                            SendTableCards();
                             // keep the cards and add the current card to this row
                             card.PlayedBy.KeptCards.AddRange(thisRow.Where(x => x != null));
                             msg += $"{GetTranslation("CardExceedRow", card.PlayedBy.GetName())}\n" +
@@ -703,23 +723,27 @@ namespace SixNimmtBot
                             Array.Clear(thisRow, 0, thisRow.Length);
                             thisRow[0] = card;
                             card.PlayedBy.SixNimmt = true;
+                            PauseSendingTableCards = false;
                         }
                         else
                         {
                             // if not yet full, add to the end
                             thisRow[Array.FindIndex(thisRow, x => x == null)] = card;
                             Send(msg += GetTranslation("SafeCard", TableCards.IndexOf(thisRow) + 1));
+                            PauseSendingTableCards = true;
                         }
                     }
 
                     Thread.Sleep(2000);
                     // at last sort the table again
                     SortTableCards();
-                    SendTableCards();
-                    Thread.Sleep(5000);
+                    // SendTableCards();
+                    Thread.Sleep(1000);
                 }
                 CleanPlayers();
                 Round++;
+                PauseSendingTableCards = false;
+                SendTableCards();
             }
             catch (Exception ex)
             {
@@ -831,7 +855,7 @@ namespace SixNimmtBot
                         newAchv = newAchv | Achievements.Addicted;
                     if (!achv.HasFlag(Achievements.Professional) && db.GetNumOfWins(p.TelegramId).First().Value >= 100) // win 100 games
                         newAchv = newAchv | Achievements.Professional;
-                    if (!achv.HasFlag(Achievements.ThirtySixNimmt) && p.FinalScore >= 36) // get > 36 bulls
+                    if (!achv.HasFlag(Achievements.ThirtySixNimmt) && p.Score >= 36) // get > 36 bulls
                         newAchv = newAchv | Achievements.ThirtySixNimmt;
                     if (!achv.HasFlag(Achievements.ZeroNimmt) && p.FinalScore == 0) // took no cards/bulls
                         newAchv = newAchv | Achievements.ZeroNimmt;
