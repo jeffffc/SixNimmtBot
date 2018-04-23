@@ -594,9 +594,9 @@ namespace SixNimmtBot
                     tempPile.Sort((x, y) => x.Number.CompareTo(y.Number));
                 }
 
-                // Send($"{GetTranslation("CardsPlayed")}\n{tempPile.Select(x => x.Number.ToString()).Aggregate((x, y) => x + " " + y)}");
+                Send($"{GetTranslation("CardsPlayed")}\n{tempPile.Select(x => x.Number.ToString()).Aggregate((x, y) => x + " " + y)}");
                 // don't show all cards yet
-                Send(GetTranslation("CardsPlayed"));
+                // Send(GetTranslation("CardsPlayed"));
                 Thread.Sleep(6000);
 
                 int row1Diff = 0;
