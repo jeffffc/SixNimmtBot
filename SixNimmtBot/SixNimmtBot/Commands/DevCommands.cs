@@ -87,5 +87,16 @@ namespace SixNimmtBot
                 }
             }
         }
+
+        [Command(Trigger = "media", DevOnly = true)]
+        public static void GetMediaFileId(Message msg, string[] args)
+        {
+            if (msg.Document != null)
+                msg.Reply(msg.Document.FileId);
+            if (msg.Photo != null)
+                msg.Reply(msg.Photo.Last().FileId);
+            if (msg.Video != null)
+                msg.Reply(msg.Video.FileId);
+        }
     }
 }
