@@ -1030,7 +1030,7 @@ namespace SixNimmtBot
             {
                 var cardRow = tableCards[i];
                 var rowBullsCount = cardRow.Where(x => x != null).Sum(x => x.Bulls);
-                var label = $"Row {i + 1}: {rowBullsCount} 🐮";
+                var label = $"{GetTranslation("Row", i + 1)} ({rowBullsCount} 🐮)";
                 buttons.Add(new Tuple<string, string>(label, $"game|{this.Id}|{p.TelegramId}|row|{i}"));
             }
             var row = new List<InlineKeyboardButton>();
