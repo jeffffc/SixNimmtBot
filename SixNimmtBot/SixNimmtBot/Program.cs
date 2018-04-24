@@ -113,7 +113,7 @@ namespace SixNimmtBot
                 msg += Environment.NewLine + $"Number of Games: {gameCount.ToString()}";
                 Console.WriteLine(msg);
 
-                var table = new ConsoleTables.ConsoleTable("Game GUID", "ChatId", "Phase", "# of Players");
+                var table = new ConsoleTables.ConsoleTable("Game GUID", "ChatId", "Phase", "Round", "# of Players");
                 foreach (SixNimmt game in games.ToArray())
                 {
                     if (game.Phase == SixNimmt.GamePhase.KillGame)
@@ -123,7 +123,8 @@ namespace SixNimmtBot
                     }
                     try
                     {
-                        table.AddRow(game.Id.ToString(), game.ChatId.ToString(), game.Phase.ToString(), game.Players.Count().ToString());
+                        table.AddRow(game.Id.ToString(), game.ChatId.ToString(), game.Phase.ToString(), 
+                            game.Round, game.Players.Count().ToString());
                     }
                     catch
                     {
