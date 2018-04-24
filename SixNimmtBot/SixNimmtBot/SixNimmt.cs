@@ -713,8 +713,11 @@ namespace SixNimmtBot
                         // if this row is full already
                         if (thisRow.Count(x => x != null) == 5)
                         {
-                            PauseSendingTableCards = false;
-                            SendTableCards();
+                            if (PauseSendingTableCards)
+                            {
+                                PauseSendingTableCards = false;
+                                SendTableCards();
+                            }
                             // keep the cards and add the current card to this row
                             card.PlayedBy.KeptCards.AddRange(thisRow.Where(x => x != null));
                             msg += $"{GetTranslation("CardExceedRow", card.PlayedBy.GetName())}\n" +
