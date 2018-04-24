@@ -889,8 +889,8 @@ namespace SixNimmtBot
                         newAchv = newAchv | Achievements.ThirtySixNimmt;
                     if (!achv.HasFlag(Achievements.ZeroNimmt) && p.FinalScore == 0) // took no cards/bulls
                         newAchv = newAchv | Achievements.ZeroNimmt;
-                    // if (!achv.HasFlag(Achievements.HeyCorgi) && Players.Any(x => Constants.Dev.Contains(x.TelegramId)))
-                    //     newAchv = newAchv | Achievements.HeyCorgi;
+                    if (!achv.HasFlag(Achievements.HeyCorgi) && Players.Any(x => Constants.Dev.Contains(x.TelegramId)))
+                        newAchv = newAchv | Achievements.HeyCorgi;
 
 
                     // now save
@@ -904,8 +904,8 @@ namespace SixNimmtBot
                     achvMsg = newFlags.Aggregate(achvMsg, (current, a) => current + $"{a.GetAchvName(Language).ToBold()}\n{a.GetAchvDescription(Language)}\n\n");
                     SendPM(p, achvMsg);
                     // special gif for HeyCorgi
-                    // if (newAchv.HasFlag(Achievements.HeyCorgi))
-                    //     BotMethods.SendDocument(p.TelegramId, new FileToSend(""), "");
+                    if (newAchv.HasFlag(Achievements.HeyCorgi))
+                        BotMethods.SendDocument(p.TelegramId, new FileToSend("CgADBAAD1wsAAmEYZAdA_htb0nUQkAI"));
                 }
             }
         }
