@@ -905,7 +905,7 @@ namespace SixNimmtBot
                     SendPM(p, achvMsg);
                     // special gif for HeyCorgi
                     if (newAchv.HasFlag(Achievements.HeyCorgi))
-                        BotMethods.SendDocument(p.TelegramId, new FileToSend("CgADBAAD1wsAAmEYZAdA_htb0nUQkAI"));
+                        BotMethods.SendDocument(p.TelegramId, new FileToSend("CgADBAAD1wsAAmEYZAdA_htb0nUQkAI"), "");
                 }
             }
         }
