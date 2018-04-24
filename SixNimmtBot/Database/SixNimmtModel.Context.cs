@@ -74,5 +74,25 @@ namespace Database
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetNumOfLoss", playerIdParameter);
         }
+    
+        public virtual ObjectResult<Nullable<int>> GetTotalNumOfBulls()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetTotalNumOfBulls");
+        }
+    
+        public virtual ObjectResult<Nullable<int>> GetTotalNumOfGames()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetTotalNumOfGames");
+        }
+    
+        public virtual ObjectResult<Nullable<int>> GetTotalNumOfGroups()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetTotalNumOfGroups");
+        }
+    
+        public virtual ObjectResult<Nullable<int>> GetTotalNumOfPlayers()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetTotalNumOfPlayers");
+        }
     }
 }

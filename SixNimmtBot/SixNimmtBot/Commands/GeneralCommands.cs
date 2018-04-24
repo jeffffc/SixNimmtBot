@@ -316,6 +316,30 @@ namespace SixNimmtBot
             }
         }
 
+        [Attributes.Command(Trigger = "globalstats")]
+        public static void GlobalStats(Message msg, string[] args)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                int numOfGroups = db.GetTotalNumOfGroups().First().Value;
+                int numOfPlayers = db.GetTotalNumOfPlayers().First().Value;
+
+                int numOfGames = db.GetTotalNumOfGames().First().Value;
+                var numOfBulls = db.GetTotalNumOfBulls().First().Value;
+                var average = db.GetAverageNumOfBulls().First().Value;
+
+                var send = GetTranslation("GlobalStatsDetails", GetLanguage(msg.Chat.Id),
+                    numOfGroups.ToBold(),
+                    numOfPlayers.ToBold(),
+                    numOfGames.ToBold(),
+                    numOfBulls.ToBold(),
+                    average.ToString("F").ToBold()
+                    );
+                msg.Reply(send);
+            }
+        }
+
+
         [Attributes.Command(Trigger = "achievements")]
         public static void Achievements(Message msg, string[] args)
         {
