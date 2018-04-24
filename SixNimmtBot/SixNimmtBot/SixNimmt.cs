@@ -551,7 +551,7 @@ namespace SixNimmtBot
                     }
                 }
 
-
+                Thread.Sleep(1000); // hopefully dont random late-voter
                 // check of afk
                 foreach (var p in Players)
                 {
