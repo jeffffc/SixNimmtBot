@@ -94,11 +94,11 @@ namespace SixNimmtBot
             if (msg.ReplyToMessage != null)
             { 
                 if (msg.ReplyToMessage.Document != null)
-                    msg.Reply(msg.Document.FileId);
+                    msg.Reply(msg.ReplyToMessage.Document.FileId);
                 if (msg.ReplyToMessage.Photo != null)
-                    msg.Reply(msg.Photo.Last().FileId);
+                    msg.Reply(msg.ReplyToMessage.Photo.Last().FileId);
                 if (msg.ReplyToMessage.Video != null)
-                    msg.Reply(msg.Video.FileId);
+                    msg.Reply(msg.ReplyToMessage.Video.FileId);
             }
         }
     }
