@@ -292,6 +292,7 @@ namespace SixNimmtBot
                 }
                 var playerName = $"{player.GetName()} (<code>{playerId}</code>)";
                 int numOfWins = db.GetNumOfWins(playerId).First().Value;
+                int numOfLoss = db.GetNumOfLoss(playerId).First().Value;
                 var numOfGames = db.GetPlayerNumOfGames(playerId).First().Value;
                 var numOfBulls = db.GetPlayerNumOfBulls(playerId).First().Value;
 
@@ -300,8 +301,14 @@ namespace SixNimmtBot
                     playerName,
                     achvCount.ToBold(),
                     numOfGames.ToBold(),
-                    $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
+                    /* $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
                     $"{numOfGames - numOfWins} ({Math.Round((double)(numOfGames - numOfWins) * 100 / numOfGames, 0)}%)".ToBold(),
+                    numOfBulls.ToBold(),
+                    avg.ToString("F").ToBold()
+                    */
+                    // number of wins
+                    numOfWins.ToBold(),
+                    numOfLoss.ToBold(),
                     numOfBulls.ToBold(),
                     avg.ToString("F").ToBold()
                     );

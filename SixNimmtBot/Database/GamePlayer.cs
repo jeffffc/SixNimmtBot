@@ -19,6 +19,7 @@ namespace Database
         public int GameId { get; set; }
         public bool Won { get; set; }
         public int Bulls { get; set; }
+        public bool Lost { get; set; }
     
         public virtual Player Player { get; set; }
         public virtual Game Game { get; set; }

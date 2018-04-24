@@ -828,6 +828,8 @@ namespace SixNimmtBot
 
             var wonPlayers = finalPlayersGrouped.Last().ToList();
             Send($"{wonPlayers.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");
+
+            var lostPlayers = finalPlayersGrouped.Count > 1 ? finalPlayersGrouped.First() : null;
             /*
             var finalPlayers = Players.OrderByDescending(x => x.FinalScore);
             foreach (var p in finalPlayers)
@@ -853,6 +855,11 @@ namespace SixNimmtBot
                         dbgp.Won = true;
                     else
                         dbgp.Won = false;
+                    // add who got most bulls too
+                    if (lostPlayers != null && lostPlayers.Contains(p))
+                        dbgp.Lost = true;
+                    else
+                        dbgp.Lost = false;
                     db.SaveChanges();
                     Thread.Sleep(200);
                 }

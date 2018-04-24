@@ -60,5 +60,19 @@ namespace Database
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetPlayerNumOfBulls", playerIdParameter);
         }
+    
+        public virtual ObjectResult<Nullable<decimal>> GetAverageNumOfBulls()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<decimal>>("GetAverageNumOfBulls");
+        }
+    
+        public virtual ObjectResult<Nullable<int>> GetNumOfLoss(Nullable<int> playerId)
+        {
+            var playerIdParameter = playerId.HasValue ?
+                new ObjectParameter("playerId", playerId) :
+                new ObjectParameter("playerId", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetNumOfLoss", playerIdParameter);
+        }
     }
 }

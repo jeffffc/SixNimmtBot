@@ -33,6 +33,7 @@ warning 6002: The table/view 'sixnimmt.dbo.Admin' does not have a primary key de
           <Property Name="GameId" Type="int" Nullable="false" />
           <Property Name="Won" Type="bit" Nullable="false" />
           <Property Name="Bulls" Type="int" Nullable="false" />
+          <Property Name="Lost" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -111,6 +112,10 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="GetAverageNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetNumOfLoss" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="playerId" Type="int" Mode="In" />
+        </Function>
         <Function Name="GetNumOfWins" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="playerId" Type="int" Mode="In" />
         </Function>
@@ -164,6 +169,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <NavigationProperty Name="Player" Relationship="Self.FK_GamePlayer_Player" FromRole="GamePlayer" ToRole="Player" />
           <Property Name="Bulls" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Game" Relationship="sixnimmtModel.FK_GamePlayer_Game" FromRole="GamePlayer" ToRole="Game" />
+          <Property Name="Lost" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Group">
           <Key>
@@ -252,6 +258,10 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <FunctionImport Name="GetPlayerNumOfBulls" ReturnType="Collection(Int32)">
           <Parameter Name="playerId" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="GetAverageNumOfBulls" ReturnType="Collection(Decimal)" />
+          <FunctionImport Name="GetNumOfLoss" ReturnType="Collection(Int32)">
+            <Parameter Name="playerId" Mode="In" Type="Int32" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="Game">
           <Key>
@@ -299,6 +309,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <EntitySetMapping Name="GamePlayers">
             <EntityTypeMapping TypeName="sixnimmtModel.GamePlayer">
               <MappingFragment StoreEntitySet="GamePlayer">
+                <ScalarProperty Name="Lost" ColumnName="Lost" />
                 <ScalarProperty Name="Bulls" ColumnName="Bulls" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="PlayerId" ColumnName="PlayerId" />
@@ -370,6 +381,8 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <FunctionImportMapping FunctionImportName="GetNumOfWins" FunctionName="sixnimmtModel.Store.GetNumOfWins" />
           <FunctionImportMapping FunctionImportName="GetPlayerNumOfGames" FunctionName="sixnimmtModel.Store.GetPlayerNumOfGames" />
           <FunctionImportMapping FunctionImportName="GetPlayerNumOfBulls" FunctionName="sixnimmtModel.Store.GetPlayerNumOfBulls" />
+          <FunctionImportMapping FunctionImportName="GetAverageNumOfBulls" FunctionName="sixnimmtModel.Store.GetAverageNumOfBulls" />
+          <FunctionImportMapping FunctionImportName="GetNumOfLoss" FunctionName="sixnimmtModel.Store.GetNumOfLoss" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
