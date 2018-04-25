@@ -45,6 +45,7 @@ namespace SixNimmtBot
         public int Round = 1;
         public InlineKeyboardMarkup BotMarkup;
         public bool UseDynamicDeck = false;
+        public int ChooseCardTime = Constants.ChooseCardTime;
 
         public bool PauseSendingTableCards = false;
         public string ToSend = "";
@@ -68,6 +69,7 @@ namespace SixNimmtBot
                 UseSticker = DbGroup.UseSticker ?? false;
                 DbGroup.UserName = chatUsername;
                 UseDynamicDeck = DbGroup.DynamicDeck ?? false;
+                ChooseCardTime = DbGroup.ChooseCardTime ?? Constants.ChooseCardTime;
                 db.SaveChanges();
                 GroupLink = DbGroup.UserName != null ? $"https://t.me/{DbGroup.UserName}" : DbGroup.GroupLink ?? null;
                 if (GroupLink != null)
@@ -515,7 +517,7 @@ namespace SixNimmtBot
                 else
                 {
                     var playerMentions = Players.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
-                    firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard")}\n{playerMentions}";
+                    firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard", ChooseCardTime.ToBold())}\n{playerMentions}";
                     Send(firstMsg, BotMarkup);
                     var currentSticker = GetTableCardsImage(TableCards);
                     foreach (var p in Players)
@@ -535,12 +537,12 @@ namespace SixNimmtBot
                         Thread.Sleep(400);
                     }
                     CurrentTableStickerId = null;
-                    for (int i = 0; i < Constants.ChooseCardTime; i++)
+                    for (int i = 0; i < ChooseCardTime; i++)
                     {
                         Thread.Sleep(1000);
                         if (Players.All(x => x.CurrentQuestion == null))
                             break;
-                        if (i == Constants.ChooseCardTime - 15)
+                        if (i == ChooseCardTime - 15)
                         {
                             // 15 secs left
                             var playersHaveNotPlayed = Players.Where(x => x.CurrentQuestion != null)
@@ -645,7 +647,7 @@ namespace SixNimmtBot
                             Environment.NewLine + Environment.NewLine +
                             GetTranslation("CardLowerThanAllPM", card.GetName()),
                             GenerateMenu(card.PlayedBy, TableCards));
-                        for (int i = 0; i < Constants.ChooseCardTime; i++)
+                        for (int i = 0; i < ChooseCardTime; i++)
                         {
                             Thread.Sleep(1000);
                             if (card.PlayedBy.CurrentQuestion == null)
