@@ -641,7 +641,7 @@ namespace SixNimmtBot
                         */
 
                         /* NEW: PLAYER CHOOSE WHICH ROW TO KEEP */
-                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention())}", BotMarkup);
+                        Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention(), ChooseCardTime.ToBold())}", BotMarkup);
                         SendMenu(card.PlayedBy,
                             TextToTable(TableCards) +
                             Environment.NewLine + Environment.NewLine +
