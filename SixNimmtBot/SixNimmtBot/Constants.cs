@@ -53,7 +53,8 @@ namespace SixNimmtBot
 #endregion
 
         public static string DonationLiveToken = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\\SixNimmt").GetValue("DonationLiveToken").ToString();
-        public static string DonationPayload = "CRIMINALDANCEBOTPAYLOAD:";
+        public static string DonationTestToken = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\\SixNimmt").GetValue("DonationTestToken").ToString();
+        public static string DonationPayload = "SIXNIMMTPAYLOAD:";
 
         public static string _imagePath = @"C:\SixNimmtImages\";
         public static string _boardPath = Path.Combine(_imagePath, "board.png");

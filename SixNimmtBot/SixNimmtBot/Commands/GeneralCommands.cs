@@ -211,8 +211,14 @@ namespace SixNimmtBot
             }
         }
 
+        [Attributes.Command(Trigger = "donatetest")]
+        public static void DonateTest(Message msg, string[] args)
+        {
+            Donate(msg, args, true);
+        }
+
         [Attributes.Command(Trigger = "donate")]
-        public static void Donate(Message msg, string[] args)
+        public static void Donate(Message msg, string[] args, bool test = false)
         {
             if (msg.Chat.Type != ChatType.Private)
             {
@@ -242,7 +248,7 @@ namespace SixNimmtBot
                     }
                     else
                     {
-                        var providerToken = Constants.DonationLiveToken;
+                        var providerToken = test == false ? Constants.DonationLiveToken : Constants.DonationTestToken;
                         var title = GetTranslation("DonateTitle", GetLanguage(msg.From.Id));
                         var description = GetTranslation("DonateDescription", GetLanguage(msg.From.Id), money);
                         var payload = Constants.DonationPayload + msg.From.Id.ToString();
