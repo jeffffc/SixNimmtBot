@@ -548,7 +548,7 @@ namespace SixNimmtBot
                             var playersHaveNotPlayed = Players.Where(x => x.CurrentQuestion != null)
                                 .Select(x => x.GetMention())
                                 .Aggregate((x, y) => x + ", " + y);
-                            Send($"{GetTranslation("ChooseCard15Secs")}\n{playersHaveNotPlayed}", BotMarkup);
+                            Send($"{GetTranslation("ChooseCard15Secs", 15.ToBold())}\n{playersHaveNotPlayed}", BotMarkup);
                         }
                     }
                 }

@@ -58,6 +58,18 @@
     <Compile Include="GamePlayer.cs">
       <DependentUpon>SixNimmtModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="GetGroupAverageNumOfBulls_Result.cs">
+      <DependentUpon>SixNimmtModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetGroupNumOfLoss_Result.cs">
+      <DependentUpon>SixNimmtModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetGroupNumOfWins_Result.cs">
+      <DependentUpon>SixNimmtModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GetGroupPlayerNumOfBulls_Result.cs">
+      <DependentUpon>SixNimmtModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Group.cs">
       <DependentUpon>SixNimmtModel.tt</DependentUpon>
     </Compile>

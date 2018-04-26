@@ -94,5 +94,59 @@ namespace Database
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetTotalNumOfPlayers");
         }
+    
+        public virtual ObjectResult<Nullable<int>> GetGroupNumOfBulls(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetGroupNumOfBulls", groupIdParameter);
+        }
+    
+        public virtual ObjectResult<Nullable<int>> GetGroupNumOfGames(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("GetGroupNumOfGames", groupIdParameter);
+        }
+    
+        public virtual ObjectResult<GetGroupNumOfLoss_Result> GetGroupNumOfLoss(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetGroupNumOfLoss_Result>("GetGroupNumOfLoss", groupIdParameter);
+        }
+    
+        public virtual ObjectResult<GetGroupNumOfWins_Result> GetGroupNumOfWins(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetGroupNumOfWins_Result>("GetGroupNumOfWins", groupIdParameter);
+        }
+    
+        public virtual ObjectResult<GetGroupAverageNumOfBulls_Result> GetGroupAverageNumOfBulls(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetGroupAverageNumOfBulls_Result>("GetGroupAverageNumOfBulls", groupIdParameter);
+        }
+    
+        public virtual ObjectResult<GetGroupPlayerNumOfBulls_Result> GetGroupPlayerNumOfBulls(Nullable<long> groupId)
+        {
+            var groupIdParameter = groupId.HasValue ?
+                new ObjectParameter("groupId", groupId) :
+                new ObjectParameter("groupId", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetGroupPlayerNumOfBulls_Result>("GetGroupPlayerNumOfBulls", groupIdParameter);
+        }
     }
 }

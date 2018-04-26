@@ -113,6 +113,24 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           </ReferentialConstraint>
         </Association>
         <Function Name="GetAverageNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="GetGroupAverageNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="GetGroupNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="GetGroupNumOfGames" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="GetGroupNumOfLoss" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="GetGroupNumOfWins" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
+        <Function Name="GetGroupPlayerNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="groupId" Type="bigint" Mode="In" />
+        </Function>
         <Function Name="GetNumOfLoss" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="playerId" Type="int" Mode="In" />
         </Function>
@@ -270,6 +288,24 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <FunctionImport Name="GetTotalNumOfGames" ReturnType="Collection(Int32)" />
           <FunctionImport Name="GetTotalNumOfGroups" ReturnType="Collection(Int32)" />
           <FunctionImport Name="GetTotalNumOfPlayers" ReturnType="Collection(Int32)" />
+          <FunctionImport Name="GetGroupNumOfBulls" ReturnType="Collection(Int32)">
+          <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="GetGroupNumOfGames" ReturnType="Collection(Int32)">
+          <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="GetGroupNumOfLoss" ReturnType="Collection(sixnimmtModel.GetGroupNumOfLoss_Result)">
+          <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="GetGroupNumOfWins" ReturnType="Collection(sixnimmtModel.GetGroupNumOfWins_Result)">
+          <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="GetGroupAverageNumOfBulls" ReturnType="Collection(sixnimmtModel.GetGroupAverageNumOfBulls_Result)">
+            <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
+          <FunctionImport Name="GetGroupPlayerNumOfBulls" ReturnType="Collection(sixnimmtModel.GetGroupPlayerNumOfBulls_Result)">
+            <Parameter Name="groupId" Mode="In" Type="Int64" />
+          </FunctionImport>
         </EntityContainer>
         <EntityType Name="Game">
           <Key>
@@ -308,6 +344,28 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="GetGroupNumOfLoss_Result">
+          <Property Type="Int32" Name="NumOfGame" Nullable="true" />
+          <Property Type="String" Name="Name" Nullable="false" />
+          <Property Type="Int32" Name="TelegramId" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetGroupNumOfWins_Result">
+          <Property Type="Int32" Name="NumOfGame" Nullable="true" />
+          <Property Type="String" Name="Name" Nullable="false" />
+          <Property Type="Int32" Name="TelegramId" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetGroupAverageNumOfBulls_Result">
+          <Property Type="Decimal" Name="average" Nullable="true" Precision="38" Scale="6" />
+          <Property Type="String" Name="Name" Nullable="false" />
+          <Property Type="String" Name="Username" Nullable="true" />
+          <Property Type="Int32" Name="TelegramId" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetGroupPlayerNumOfBulls_Result">
+          <Property Type="Int32" Name="NumOfBulls" Nullable="true" />
+          <Property Type="String" Name="Name" Nullable="false" />
+          <Property Type="String" Name="Username" Nullable="true" />
+          <Property Type="Int32" Name="TelegramId" Nullable="false" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -395,6 +453,46 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <FunctionImportMapping FunctionImportName="GetTotalNumOfGames" FunctionName="sixnimmtModel.Store.GetTotalNumOfGames" />
           <FunctionImportMapping FunctionImportName="GetTotalNumOfGroups" FunctionName="sixnimmtModel.Store.GetTotalNumOfGroups" />
           <FunctionImportMapping FunctionImportName="GetTotalNumOfPlayers" FunctionName="sixnimmtModel.Store.GetTotalNumOfPlayers" />
+          <FunctionImportMapping FunctionImportName="GetGroupNumOfBulls" FunctionName="sixnimmtModel.Store.GetGroupNumOfBulls" />
+          <FunctionImportMapping FunctionImportName="GetGroupNumOfGames" FunctionName="sixnimmtModel.Store.GetGroupNumOfGames" />
+          <FunctionImportMapping FunctionImportName="GetGroupNumOfLoss" FunctionName="sixnimmtModel.Store.GetGroupNumOfLoss">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="sixnimmtModel.GetGroupNumOfLoss_Result">
+                <ScalarProperty Name="NumOfGame" ColumnName="NumOfGame" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TelegramId" ColumnName="TelegramId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetGroupNumOfWins" FunctionName="sixnimmtModel.Store.GetGroupNumOfWins">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="sixnimmtModel.GetGroupNumOfWins_Result">
+                <ScalarProperty Name="NumOfGame" ColumnName="NumOfGame" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TelegramId" ColumnName="TelegramId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetGroupAverageNumOfBulls" FunctionName="sixnimmtModel.Store.GetGroupAverageNumOfBulls">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="sixnimmtModel.GetGroupAverageNumOfBulls_Result">
+                <ScalarProperty Name="average" ColumnName="average" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="TelegramId" ColumnName="TelegramId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetGroupPlayerNumOfBulls" FunctionName="sixnimmtModel.Store.GetGroupPlayerNumOfBulls">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="sixnimmtModel.GetGroupPlayerNumOfBulls_Result">
+                <ScalarProperty Name="NumOfBulls" ColumnName="NumOfBulls" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="TelegramId" ColumnName="TelegramId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

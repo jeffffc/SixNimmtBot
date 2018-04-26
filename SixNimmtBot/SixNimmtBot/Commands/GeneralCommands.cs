@@ -388,6 +388,49 @@ namespace SixNimmtBot
             }
         }
 
+        [Attributes.Command(Trigger = "groupstats", GroupOnly = true)]
+        public static void GroupStats(Message msg, string[] args)
+        {
+            var chatId = msg.Chat.Id;
+            using (var db = new SixNimmtDb())
+            {
+                var numOfGames = db.GetGroupNumOfGames(chatId).First().Value;
+                var numOfBulls = db.GetGroupNumOfBulls(chatId).First().Value;
+
+                var playerAverageBulls = db.GetGroupAverageNumOfBulls(chatId).ToList();
+                var playerBullsText = "";
+                var i = 1;
+                var temp = playerAverageBulls;
+                temp.Reverse();
+                temp = temp.Take(3).ToList();
+                foreach (var res in temp)
+                {
+                    var name = res.Username == null ? res.Name.ToBold() : $"<a href='https://t.me/{res.Username}'>{res.Name}</a>";
+                    var bulls = (decimal)res.average;
+                    playerBullsText += $"{i}. {GetTranslation("GroupStatsPlayerBulls", GetLanguage(chatId), bulls.ToString("F").ToBold(), name)}\n";
+                    i++;
+                }
+                var playerBullsText2 = "";
+                i = 1;
+                foreach (var res in playerAverageBulls.Take(3).ToList())
+                {
+                    var name = res.Username == null ? res.Name.ToBold() : $"<a href='https://t.me/{res.Username}'>{res.Name}</a>";
+                    var bulls = (decimal)res.average;
+                    playerBullsText2 += $"{i}. {GetTranslation("GroupStatsPlayerBulls", GetLanguage(chatId), bulls.ToString("F").ToBold(), name)}\n";
+                    i++;
+                }
+
+                var send = GetTranslation("GroupStatsDetails", GetLanguage(msg.Chat.Id),
+                    msg.Chat.Title.FormatHTML().ToBold(),
+                    numOfGames.ToBold(),
+                    numOfBulls.ToBold(),
+                    playerBullsText,
+                    playerBullsText2
+                    );
+                msg.Reply(send);
+            }
+        }
+
 
         [Attributes.Command(Trigger = "achievements")]
         public static void Achievements(Message msg, string[] args)
