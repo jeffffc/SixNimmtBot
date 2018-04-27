@@ -62,30 +62,37 @@ namespace SixNimmtBot
                 var queries = args[1].Split(';');
                 foreach (var sql in queries)
                 {
-                    using (var comm = conn.CreateCommand())
+                    try
                     {
-                        comm.CommandText = sql;
-                        if (string.IsNullOrEmpty(sql)) continue;
-                        var reader = comm.ExecuteReader();
-                        var result = "";
-                        if (reader.HasRows)
+                        using (var comm = conn.CreateCommand())
                         {
-                            for (int i = 0; i < reader.FieldCount; i++)
-                                raw += $"<code>{reader.GetName(i).FormatHTML()}</code>" + (i == reader.FieldCount - 1 ? "" : " - ");
-                            result += raw + Environment.NewLine;
-                            raw = "";
-                            while (reader.Read())
+                            comm.CommandText = sql;
+                            if (string.IsNullOrEmpty(sql)) continue;
+                            var reader = comm.ExecuteReader();
+                            var result = "";
+                            if (reader.HasRows)
                             {
                                 for (int i = 0; i < reader.FieldCount; i++)
-                                    raw += (reader.IsDBNull(i) ? "<i>NULL</i>" : $"<code>{reader[i].ToString().FormatHTML()}</code>") + (i == reader.FieldCount - 1 ? "" : " - ");
+                                    raw += $"<code>{reader.GetName(i).FormatHTML()}</code>" + (i == reader.FieldCount - 1 ? "" : " - ");
                                 result += raw + Environment.NewLine;
                                 raw = "";
+                                while (reader.Read())
+                                {
+                                    for (int i = 0; i < reader.FieldCount; i++)
+                                        raw += (reader.IsDBNull(i) ? "<i>NULL</i>" : $"<code>{reader[i].ToString().FormatHTML()}</code>") + (i == reader.FieldCount - 1 ? "" : " - ");
+                                    result += raw + Environment.NewLine;
+                                    raw = "";
+                                }
                             }
-                        }
 
-                        result += reader.RecordsAffected == -1 ? "" : (reader.RecordsAffected + " records affected");
-                        result = !String.IsNullOrEmpty(result) ? result : (sql.ToLower().StartsWith("select") ? "Nothing found" : "Done.");
-                        msg.Reply(result);
+                            result += reader.RecordsAffected == -1 ? "" : (reader.RecordsAffected + " records affected");
+                            result = !String.IsNullOrEmpty(result) ? result : (sql.ToLower().StartsWith("select") ? "Nothing found" : "Done.");
+                            msg.Reply(result);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        msg.Reply($"<b>SQL Exception</b>:\n{e.Message}");
                     }
                 }
             }
