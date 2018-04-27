@@ -513,6 +513,7 @@ namespace SixNimmtBot
                 {
                     firstMsg += Environment.NewLine + GetTranslation("OneCardLeft");
                     Send(firstMsg);
+                    Thread.Sleep(3000); // slow down last round
                 }
                 else
                 {
@@ -825,7 +826,7 @@ namespace SixNimmtBot
                     thisScoreMsg += Environment.NewLine;
                 }
                 Send(thisScoreMsg);
-                Thread.Sleep(3000);
+                Thread.Sleep(5000); // slow down ending 
             }
 
             var wonPlayers = finalPlayersGrouped.Last().ToList();
