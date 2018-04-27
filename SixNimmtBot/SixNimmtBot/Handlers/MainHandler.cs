@@ -66,8 +66,8 @@ namespace SixNimmtBot.Handlers
         {
             try
             {
-                var strings = Program.Langs[language].Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
-                              Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                var strings = Program.Langs[language].XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
+                              Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                 if (strings != null)
                 {
                     var values = strings.Descendants("value");
@@ -87,7 +87,7 @@ namespace SixNimmtBot.Handlers
                 {
                     //try the english string to be sure
                     var strings =
-                        Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                        Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                     var values = strings?.Descendants("value");
                     if (values != null)
                     {
@@ -191,6 +191,18 @@ namespace SixNimmtBot.Handlers
                 if (grp == null)
                     return;
                 grp.DynamicDeck = useDynamic;
+                db.SaveChanges();
+            }
+        }
+
+        public static void SetGroupListConfig(long chatId, bool show)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                var grp = db.Groups.FirstOrDefault(x => x.GroupId == chatId);
+                if (grp == null)
+                    return;
+                grp.ShowOnGroupList = show;
                 db.SaveChanges();
             }
         }

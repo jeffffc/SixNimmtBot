@@ -68,10 +68,11 @@ namespace SixNimmtBot
                 DbGroup = db.Groups.FirstOrDefault(x => x.GroupId == ChatId);
                 UseSticker = DbGroup.UseSticker ?? false;
                 DbGroup.UserName = chatUsername;
+                GroupLink = DbGroup.UserName != null ? $"https://t.me/{DbGroup.UserName}" : DbGroup.GroupLink ?? null;
+                DbGroup.GroupLink = GroupLink;
                 UseDynamicDeck = DbGroup.DynamicDeck ?? false;
                 ChooseCardTime = DbGroup.ChooseCardTime ?? Constants.ChooseCardTime;
                 db.SaveChanges();
-                GroupLink = DbGroup.UserName != null ? $"https://t.me/{DbGroup.UserName}" : DbGroup.GroupLink ?? null;
                 if (GroupLink != null)
                     GroupMarkup = new InlineKeyboardMarkup(
                         new InlineKeyboardButton[][] {
@@ -1164,7 +1165,8 @@ namespace SixNimmtBot
                     Locale = new Locale
                     {
                         Language = Path.GetFileNameWithoutExtension(file),
-                        File = doc
+                        XMLFile = doc,
+                        LanguageName = doc.Descendants("language").FirstOrDefault().Attribute("name").Value
                     };
                 }
                 Language = Locale.Language;
@@ -1180,8 +1182,8 @@ namespace SixNimmtBot
         {
             try
             {
-                var strings = Locale.File.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
-                              Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                var strings = Locale.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
+                              Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                 if (strings != null)
                 {
                     var values = strings.Descendants("value");
@@ -1201,7 +1203,7 @@ namespace SixNimmtBot
                 {
                     //try the english string to be sure
                     var strings =
-                        Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                        Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                     var values = strings?.Descendants("value");
                     if (values != null)
                     {

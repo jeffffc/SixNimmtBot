@@ -1,5 +1,6 @@
 ﻿using Database;
 using SixNimmtBot.Models;
+using SixNimmtBot.Models.General;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -102,26 +103,37 @@ namespace SixNimmtBot
             };
         }
 
-        public static Dictionary<string, XDocument> ReadLanguageFiles()
+        public static Dictionary<string, Locale> ReadLanguageFiles()
         {
             var files = Directory.GetFiles(Constants.GetLangDirectory());
-            var langs = new Dictionary<string, XDocument>();
+            var langs = new Dictionary<string, Locale>();
             try
             {
                 foreach (var file in files)
                 {
                     var lang = Path.GetFileNameWithoutExtension(file);
                     XDocument doc = XDocument.Load(file);
-                    langs.Add(lang, doc);
+                    var loc = new Locale
+                    {
+                        Language = Path.GetFileNameWithoutExtension(file),
+                        XMLFile = doc,
+                        LanguageName = doc.Descendants("language").FirstOrDefault().Attribute("name").Value
+                    };
+                    langs.Add(lang, loc);
                 }
             }
             catch { }
             return langs;
         }
 
-        public static XDocument ReadEnglish()
+        public static Locale ReadEnglish()
         {
-            return XDocument.Load(Path.Combine(Constants.GetLangDirectory(), "English.xml"));
+            return new Locale
+            {
+                Language = "English",
+                XMLFile = XDocument.Load(Path.Combine(Constants.GetLangDirectory(), "English.xml")),
+                LanguageName = "English"
+            };
         }
 
         public static string GetLanguage(long id)
@@ -162,8 +174,8 @@ namespace SixNimmtBot
         {
             try
             {
-                var strings = Program.Langs[language].Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
-                              Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                var strings = Program.Langs[language].XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key) ??
+                              Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                 if (strings != null)
                 {
                     var values = strings.Descendants("value");
@@ -183,7 +195,7 @@ namespace SixNimmtBot
                 {
                     //try the english string to be sure
                     var strings =
-                        Program.English.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
+                        Program.English.XMLFile.Descendants("string").FirstOrDefault(x => x.Attribute("key")?.Value == key);
                     var values = strings?.Descendants("value");
                     if (values != null)
                     {
@@ -231,7 +243,7 @@ namespace SixNimmtBot
             //first, reload existing file to program
             Program.English = Helpers.ReadEnglish();
             Program.Langs = Helpers.ReadLanguageFiles();
-            var langs = Program.Langs.Select(x => new LangFile(x.Key, x.Value));
+            var langs = Program.Langs.Select(x => new LangFile(x.Key, x.Value.XMLFile));
             var master = Program.English;
             var newFile = new LangFile(newFilePath);
 
@@ -256,7 +268,7 @@ namespace SixNimmtBot
             }
 
             //get the errors in it
-            GetFileErrors(newFile, newFileErrors, master);
+            GetFileErrors(newFile, newFileErrors, master.XMLFile);
 
             //need to get the current file
             var curFile = langs.FirstOrDefault(x => x.Name == newFile.Name);
@@ -278,7 +290,7 @@ namespace SixNimmtBot
                 //}
 
                 //get the errors in it
-                GetFileErrors(curFile, curFileErrors, master);
+                GetFileErrors(curFile, curFileErrors, master.XMLFile);
             }
 
             //send the validation result

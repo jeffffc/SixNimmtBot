@@ -11,7 +11,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.Payments;
+using Telegram.Bot.Types.ReplyMarkups;
 using static SixNimmtBot.Helpers;
 
 namespace SixNimmtBot
@@ -161,36 +163,6 @@ namespace SixNimmtBot
             Bot.Send(msg.Chat.Id, GetTranslation("GetWhichLang", GetLanguage(msg.Chat.Id)), Handler.GetGetLangMenu());
         }
 
-        [Attributes.Command(Trigger = "reloadlangs", DevOnly = true)]
-        public static void ReloadLang(Message msg, string[] args)
-        {
-            Program.English = Helpers.ReadEnglish();
-            Program.Langs = Helpers.ReadLanguageFiles();
-            msg.Reply("Done.");
-        }
-
-        [Attributes.Command(Trigger = "uploadlang", DevOnly = true)]
-        public static void UploadLang(Message msg, string[] args)
-        {
-            try
-            {
-                var id = msg.Chat.Id;
-                if (msg.ReplyToMessage?.Type != MessageType.DocumentMessage)
-                {
-                    Bot.Send(id, "Please reply to the file with /uploadlang");
-                    return;
-                }
-                var fileid = msg.ReplyToMessage.Document?.FileId;
-                if (fileid != null)
-                    UploadFile(fileid, id,
-                        msg.ReplyToMessage.Document.FileName,
-                        msg.MessageId);
-            }
-            catch (Exception e)
-            {
-                Bot.Send(msg.Chat.Id, e.Message, parseMode: ParseMode.Default);
-            }
-        }
 
         [Attributes.Command(Trigger = "rules")]
         public static void Rules(Message msg, string[] args)
@@ -493,6 +465,13 @@ namespace SixNimmtBot
                 db.SaveChanges();
             }
             msg.Reply(GetTranslation("LinkRemoved", GetLanguage(msg.Chat.Id)));
+        }
+
+        [Attributes.Command(Trigger = "grouplist")]
+        public static void GroupList(Message msg, string[] args)
+        {
+            var menu = Handler.GetGroupListMenu(msg.From.Id);
+            msg.ReplyPM(GetTranslation("GroupList", GetLanguage(msg.From.Id)), menu);
         }
     }
 }

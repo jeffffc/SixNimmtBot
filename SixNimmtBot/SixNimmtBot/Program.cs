@@ -18,8 +18,8 @@ namespace SixNimmtBot
 {
     class Program
     {
-        internal static XDocument English;
-        public static Dictionary<string, XDocument> Langs;
+        internal static Locale English;
+        public static Dictionary<string, Locale> Langs;
         public static readonly MemoryCache AdminCache = new MemoryCache("GroupAdmins");
         public static bool MaintMode = false;
         public static DateTime Startup;

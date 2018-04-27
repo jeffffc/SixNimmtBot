@@ -136,6 +136,27 @@ namespace SixNimmtBot
 
                 }
             }
+            else if (temp[0] == "grouplist")
+            {
+                if (temp.Length == 2)
+                {
+                    var menu = Handler.GetConfigGroupListMenu(chatId);
+                    // should be group only
+                    var group = Helpers.GetGroup(chatId);
+                    var current = group.ShowOnGroupList ?? false;
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId,
+                        GetTranslation("ConfigGroupListDetail", GetLanguage(chatId),
+                        current == true ? GetTranslation("ConfigYes", GetLanguage(chatId)) : GetTranslation("ConfigNo", GetLanguage(chatId))), menu);
+                }
+                if (temp.Length > 2)
+                {
+                    var chosen = temp[2] == "yes";
+                    Handler.SetGroupListConfig(chatId, chosen);
+                    var menu = Handler.GetConfigMenu(chatId);
+                    var toSend = GetTranslation("ReceivedButton", GetLanguage(chatId)) + Environment.NewLine + GetTranslation("WhatToDo", GetLanguage(chatId));
+                    Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, toSend, menu);
+                }
+            }
             else if (temp[0] == "done")
             {
                 Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ConfigDone", GetLanguage(chatId)));
@@ -145,6 +166,40 @@ namespace SixNimmtBot
                 Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("WhatToDo", Handler.GetLanguage(chatId)), Handler.GetConfigMenu(chatId));
             }
             return;
+        }
+
+        [Callback(Trigger = "grouplist")]
+        public static void GroupListQuery(CallbackQuery query, string[] args)
+        {
+            var temp = args[1].Split('|');
+            var chatId = int.Parse(temp[0]);
+            if (temp[1] == "done")
+            {
+                Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, GetTranslation("ConfigDone", GetLanguage(chatId)));
+            }
+            else
+            {
+                var langChosen = temp[1];
+                using (var db = new SixNimmtDb())
+                {
+                    try
+                    {
+                        var groups = db.Groups.Where(x => x.GroupLink != null && x.ShowOnGroupList == true && x.Language == langChosen).Take(10).ToList();
+                    
+                        var msg = $"{GetTranslation("GroupListForLang", GetLanguage(chatId), Program.Langs[langChosen].LanguageName)}\n";
+                        foreach (var grp in groups)
+                        {
+                            msg += $"<a href='{grp.GroupLink}'>{grp.Name.FormatHTML()}</a>\n";
+                        }
+                        Bot.Edit(query.Message.Chat.Id, query.Message.MessageId, msg);
+                        }
+                    catch (Exception e)
+                    {
+                        //
+                    }
+                }
+            }
+            
         }
 
         [Callback(Trigger = "getlang")]

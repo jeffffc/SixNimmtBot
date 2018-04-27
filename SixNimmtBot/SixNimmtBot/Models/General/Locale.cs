@@ -10,6 +10,7 @@ namespace SixNimmtBot.Models.General
     public class Locale
     {
         public string Language { get; set; }
-        public XDocument File { get; set; }
+        public XDocument XMLFile { get; set; }
+        public string LanguageName { get; set; }
     }
 }

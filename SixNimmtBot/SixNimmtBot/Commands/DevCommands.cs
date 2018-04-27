@@ -98,6 +98,37 @@ namespace SixNimmtBot
             }
         }
 
+        [Attributes.Command(Trigger = "reloadlangs", DevOnly = true)]
+        public static void ReloadLang(Message msg, string[] args)
+        {
+            Program.English = Helpers.ReadEnglish();
+            Program.Langs = Helpers.ReadLanguageFiles();
+            msg.Reply("Done.");
+        }
+
+        [Attributes.Command(Trigger = "uploadlang", DevOnly = true)]
+        public static void UploadLang(Message msg, string[] args)
+        {
+            try
+            {
+                var id = msg.Chat.Id;
+                if (msg.ReplyToMessage?.Type != MessageType.DocumentMessage)
+                {
+                    Bot.Send(id, "Please reply to the file with /uploadlang");
+                    return;
+                }
+                var fileid = msg.ReplyToMessage.Document?.FileId;
+                if (fileid != null)
+                    UploadFile(fileid, id,
+                        msg.ReplyToMessage.Document.FileName,
+                        msg.MessageId);
+            }
+            catch (Exception e)
+            {
+                Bot.Send(msg.Chat.Id, e.Message, parseMode: ParseMode.Default);
+            }
+        }
+
         [Attributes.Command(Trigger = "media", DevOnly = true)]
         public static void GetMediaFileId(Message msg, string[] args)
         {
