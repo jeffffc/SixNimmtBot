@@ -400,7 +400,7 @@ namespace SixNimmtBot
                 var playerAverageBulls = db.GetGroupAverageNumOfBulls(chatId).ToList();
                 var playerBullsText = "";
                 var i = 1;
-                var temp = playerAverageBulls;
+                var temp = playerAverageBulls.ToList();
                 temp.Reverse();
                 temp = temp.Take(3).ToList();
                 foreach (var res in temp)
