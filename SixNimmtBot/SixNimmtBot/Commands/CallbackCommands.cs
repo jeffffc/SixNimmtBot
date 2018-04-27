@@ -184,7 +184,7 @@ namespace SixNimmtBot
                 {
                     try
                     {
-                        var groups = db.Groups.Where(x => x.GroupLink != null && x.ShowOnGroupList == true && x.Language == langChosen).Take(10).ToList();
+                        var groups = db.Groups.Where(x => x.GroupLink != null && x.ShowOnGroupList == true && x.Language == langChosen).ToList().Shuffle().Take(10).ToList();
                     
                         var msg = $"{GetTranslation("GroupListForLang", GetLanguage(chatId), Program.Langs[langChosen].LanguageName)}\n";
                         foreach (var grp in groups)
