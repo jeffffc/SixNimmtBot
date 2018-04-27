@@ -202,7 +202,7 @@ namespace SixNimmtBot
             }
         }
 
-        [Attributes.Command(Trigger = "full")]
+        [Attributes.Command(Trigger = "full", DevOnly = true)]
         public static void FullInfo(Message msg, string[] args)
         {
             Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
