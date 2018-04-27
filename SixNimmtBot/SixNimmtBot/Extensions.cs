@@ -54,10 +54,10 @@ namespace SixNimmtBot
         }
 
 
-        public static void LogError(this Exception e, long chatId = 0)
+        public static void LogError(this Exception e, long? chatId = null)
         {
             string m = "Error occured." + Environment.NewLine;
-            if (chatId > 0)
+            if (chatId != null)
                 m += $"ChatId: {chatId}" + Environment.NewLine + Environment.NewLine;
             var trace = e.StackTrace;
             do
