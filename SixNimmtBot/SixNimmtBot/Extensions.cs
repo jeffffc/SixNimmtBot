@@ -130,11 +130,11 @@ namespace SixNimmtBot
             return $"<i>{str.ToString().FormatHTML()}</i>";
         }
 
-        public static string ToCode(this string str)
+        public static string ToCode(this object str)
         {
             if (str == null)
                 return null;
-            return $"<code>{str.FormatHTML()}</code>";
+            return $"<code>{str.ToString().FormatHTML()}</code>";
         }
 
         public static string FormatHTML(this string str)

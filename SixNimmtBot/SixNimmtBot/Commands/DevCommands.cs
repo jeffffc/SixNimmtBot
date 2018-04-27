@@ -201,5 +201,26 @@ namespace SixNimmtBot
                 msg.Reply("Please reply to a (forwarded) message of the player, or provide the ID/Username/Mention.");
             }
         }
+
+        [Attributes.Command(Trigger = "full")]
+        public static void FullInfo(Message msg, string[] args)
+        {
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            string buildDate = new DateTime(2000, 1, 1).Add(new TimeSpan(
+                TimeSpan.TicksPerDay * version.Build + // days since 1 January 2000
+                TimeSpan.TicksPerSecond * 2 * version.Revision)).ToString();
+            string uptime = $"{(DateTime.Now - Program.Startup):dd\\.hh\\:mm\\:ss\\.ff}";
+            int gamecount = Bot.Games.Count;
+            int playercount = Bot.Games.Select(x => x.Players.Count).Sum();
+            var toSend = "";
+            foreach (var g in Bot.Games.ToList().OrderBy(x => x.Phase))
+            {
+                if (g.Phase == SixNimmt.GamePhase.InGame)
+                    toSend += $"{g.GroupName.ToBold()}:\n--- {g.Players.Count.ToCode()} Players; Round {g.Round.ToCode()}\n";
+                else
+                    toSend += $"{g.GroupName.ToBold()}:\n--- {g.Players.Count.ToCode()} Players; {g.Phase.ToCode()}\n";
+            }
+            Bot.Send(msg.Chat.Id, $"Version: {version.ToString().ToCode()}\nBuild Date: {buildDate.ToCode()}\nUptime: {uptime.ToCode()}\nGame count: {gamecount.ToString().ToCode()}\nPlayer count: {playercount.ToString().ToCode()}\n\n{toSend}");
+        }
     }
 }
