@@ -519,7 +519,6 @@ namespace SixNimmtBot
                 {
                     var playerMentions = Players.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                     firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard", ChooseCardTime.ToBold())}\n{playerMentions}";
-                    Send(firstMsg, BotMarkup);
                     var currentSticker = GetTableCardsImage(TableCards);
                     foreach (var p in Players)
                     {
@@ -537,6 +536,9 @@ namespace SixNimmtBot
                         }
                         Thread.Sleep(400);
                     }
+                    // PM menu first, and then announce in group
+                    Send(firstMsg, BotMarkup);
+
                     CurrentTableStickerId = null;
                     for (int i = 0; i < ChooseCardTime; i++)
                     {
@@ -750,6 +752,7 @@ namespace SixNimmtBot
                 Round++;
                 PauseSendingTableCards = false;
                 SendTableCards();
+                Thread.Sleep(3000);
             }
             catch (Exception ex)
             {
