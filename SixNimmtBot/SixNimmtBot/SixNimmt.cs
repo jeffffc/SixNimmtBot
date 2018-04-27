@@ -1239,7 +1239,14 @@ namespace SixNimmtBot
         public void Log(Exception ex)
         {
             ex.LogError(ChatId);
-            Send("Sorry there is some problem with me, I gonna go die now.");
+            try
+            {
+                Send("Sorry there is some problem with me, I gonna go die now.");
+            }
+            catch
+            {
+                //
+            }
             this.Phase = GamePhase.Ending;
             Bot.RemoveGame(this);
         }
