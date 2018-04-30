@@ -15,6 +15,9 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Windows.Forms.DataVisualization.Charting;
+using System.Drawing;
+using System.Data;
 
 namespace SixNimmtBot
 {
@@ -520,6 +523,60 @@ namespace SixNimmtBot
             return new InlineKeyboardMarkup(rows.ToArray());
         }
 
+        public static Chart CreateGameCountChart(DataSet source)
+        {
+            Chart chart = new Chart();
+            chart.DataSource = source.Tables[0];
+            chart.Width = 600;
+            chart.Height = 350;
+            chart.Titles.Add("Game Count for the past week");
+            chart.Titles[0].Font = new Font("Tahoma", 16.0f);
+            //create serie...
+            Series serie1 = new Series();
+            serie1.Name = "Serie1";
+            serie1.Color = Color.Blue;
+            serie1.BorderColor = Color.Black;
+            serie1.ChartType = SeriesChartType.Line;
+            serie1.BorderDashStyle = ChartDashStyle.Solid;
+            serie1.BorderWidth = 5;
+            serie1.ShadowColor = Color.FromArgb(128, 128, 128);
+            serie1.ShadowOffset = 1;
+            serie1.IsValueShownAsLabel = true;
+            serie1.XValueMember = "GameDate";
+            serie1.YValueMembers = "Num";
+            serie1.Font = new Font("Tahoma", 10.0f);
+            serie1.BackSecondaryColor = Color.FromArgb(0, 102, 153);
+            serie1.LabelForeColor = Color.FromArgb(100, 100, 100);
+            chart.Series.Add(serie1);
+            //create chartareas...
+            ChartArea ca = new ChartArea();
+            ca.Name = "Game Growth";
+
+            ca.BackColor = Color.White;
+            ca.BorderColor = Color.FromArgb(26, 59, 105);
+            ca.BorderWidth = 0;
+            ca.BorderDashStyle = ChartDashStyle.Dash;
+            ca.AxisX = new Axis();
+            ca.AxisX.Title = "Date";
+            ca.AxisX.TitleAlignment = StringAlignment.Center;
+            ca.AxisX.MajorGrid.LineDashStyle = ChartDashStyle.Dot;
+            ca.AxisX.MajorGrid.LineWidth = 2;
+            ca.AxisY = new Axis();
+            chart.ChartAreas.Add(ca);
+            ca.AxisY.Title = "Game Count";
+            ca.AxisY.TitleAlignment = StringAlignment.Center;
+            ca.AxisY.TextOrientation = TextOrientation.Rotated270;
+            ca.AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dot;
+            ca.AxisY.MajorGrid.LineWidth = 2;
+
+
+            //databind...
+            chart.DataBind();
+            //save result...
+            //chart.SaveImage(@"c:\myChart.png", ChartImageFormat.Png);
+            return chart;
+        }
+
         public class LanguageError
         {
             public string File { get; set; }
@@ -542,4 +599,6 @@ namespace SixNimmtBot
         }
         #endregion
     }
+
+
 }

@@ -13,6 +13,7 @@ using Database;
 using Telegram.Bot.Types.Enums;
 using SixNimmtBot.Models.General;
 using static SixNimmtBot.Helpers;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace SixNimmtBot
 {
@@ -253,5 +254,56 @@ namespace SixNimmtBot
             }
             Bot.Send(msg.Chat.Id, $"Version: {version.ToString().ToCode()}\nBuild Date: {buildDate.ToCode()}\nUptime: {uptime.ToCode()}\nGame count: {gamecount.ToString().ToCode()}\nPlayer count: {playercount.ToString().ToCode()}\n\n{toSend}");
         }
+
+
+        [Attributes.Command(Trigger = "growth", DevOnly = true)]
+        public static void CheckGrowth(Message msg, string[] args)
+        {
+            using (var db = new SixNimmtDb())
+            {
+                try
+                {
+                    var sql = @"
+    select top 7 
+	CONVERT(date, timestarted) as [GameDate], 
+	count(*) as [Num]
+	from game
+	where timeended is not null 
+	and convert(date, timestarted) <> convert(date, getdate())
+	group by CONVERT(date, timestarted) 
+	order by CONVERT(date, timestarted) desc";
+                    var res = db.Database.SqlQuery<GrowthStat>(sql).ToList();
+                    res.Reverse();
+                    var ds = new DataSet();
+                    var dt = new DataTable();
+                    dt.Columns.Add("GameDate", typeof(string));
+                    dt.Columns.Add("Num", typeof(int));
+
+                    foreach (var r in res)
+                    {
+                        var row = dt.NewRow();
+                        row[0] = r.GameDate.ToShortDateString();
+                        row[1] = r.Num;
+                        dt.Rows.Add(row);
+                    }
+                    ds.Tables.Add(dt);
+                    var chart = CreateGameCountChart(ds);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        chart.SaveImage(ms, ChartImageFormat.Png);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        var image = new FileToSend("growth", ms);
+                        Bot.Api.SendPhotoAsync(msg.Chat.Id, image, replyToMessageId: msg.MessageId).Wait();
+                    }
+                }
+                catch (Exception e)
+                {
+                    //
+                }
+                //
+            }
+        }
+
+       
     }
 }

@@ -70,6 +70,9 @@
     <Compile Include="GetGroupPlayerNumOfBulls_Result.cs">
       <DependentUpon>SixNimmtModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="GetLastWeekTotalGames_Result.cs">
+      <DependentUpon>SixNimmtModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Group.cs">
       <DependentUpon>SixNimmtModel.tt</DependentUpon>
     </Compile>

@@ -148,5 +148,10 @@ namespace Database
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetGroupPlayerNumOfBulls_Result>("GetGroupPlayerNumOfBulls", groupIdParameter);
         }
+    
+        public virtual ObjectResult<GetLastWeekTotalGames_Result> GetLastWeekTotalGames()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetLastWeekTotalGames_Result>("GetLastWeekTotalGames");
+        }
     }
 }

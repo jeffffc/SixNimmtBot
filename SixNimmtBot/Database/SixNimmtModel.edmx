@@ -132,6 +132,7 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
         <Function Name="GetGroupPlayerNumOfBulls" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="groupId" Type="bigint" Mode="In" />
         </Function>
+        <Function Name="GetLastWeekTotalGames" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="GetNumOfLoss" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="playerId" Type="int" Mode="In" />
         </Function>
@@ -308,6 +309,8 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <FunctionImport Name="GetGroupPlayerNumOfBulls" ReturnType="Collection(sixnimmtModel.GetGroupPlayerNumOfBulls_Result)">
           <Parameter Name="groupId" Mode="In" Type="Int64" />
           </FunctionImport>
+          <FunctionImport Name="GetLastWeekTotalGames" ReturnType="Collection(sixnimmtModel.GetLastWeekTotalGames_Result)" >
+            </FunctionImport>
         </EntityContainer>
         <EntityType Name="Game">
           <Key>
@@ -367,6 +370,10 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
           <Property Type="String" Name="Name" Nullable="false" />
           <Property Type="String" Name="Username" Nullable="true" />
           <Property Type="Int32" Name="TelegramId" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="GetLastWeekTotalGames_Result">
+          <Property Type="DateTime" Name="t" Nullable="true" />
+          <Property Type="Int32" Name="Column1" Nullable="true" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -493,6 +500,14 @@ warning 6002: The table/view 'sixnimmt.dbo.NotifyGame' does not have a primary k
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Username" ColumnName="Username" />
                 <ScalarProperty Name="TelegramId" ColumnName="TelegramId" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetLastWeekTotalGames" FunctionName="sixnimmtModel.Store.GetLastWeekTotalGames">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="sixnimmtModel.GetLastWeekTotalGames_Result">
+                <ScalarProperty Name="t" ColumnName="t" />
+                <ScalarProperty Name="Column1" ColumnName="Column1" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
