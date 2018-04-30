@@ -86,7 +86,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\General\CustomConsoleTable.cs" />
     <Compile Include="Models\General\GroupAdmin.cs" />
-    <Compile Include="Models\General\GrowthStat.cs" />
+    <Compile Include="Models\General\Graphs.cs" />
     <Compile Include="Models\General\Locale.cs" />
     <Compile Include="Models\Game\SNCard.cs" />
     <Compile Include="Models\Game\SNDeck.cs" />

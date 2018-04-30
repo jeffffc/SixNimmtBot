@@ -48,7 +48,7 @@ namespace SixNimmtBot
         [Attributes.Command(Trigger = "sql", DevOnly = true)]
         public static void Sql(Message msg, string[] args)
         {
-            if (args.Length == 1)
+            if (args[1] == null)
             {
                 msg.Reply("You must enter a sql query.");
                 return;
@@ -259,12 +259,17 @@ namespace SixNimmtBot
         [Attributes.Command(Trigger = "growth", DevOnly = true)]
         public static void CheckGrowth(Message msg, string[] args)
         {
+            var i = 7;
+            if (args[1] != null)
+            {
+                int.TryParse(args[1].Split()[0], out i);
+            }
             using (var db = new SixNimmtDb())
             {
                 try
                 {
-                    var sql = @"
-    select top 7 
+                    var sql = $@"
+    select top {i} 
 	CONVERT(date, timestarted) as [GameDate], 
 	count(*) as [Num]
 	from game
@@ -272,7 +277,7 @@ namespace SixNimmtBot
 	and convert(date, timestarted) <> convert(date, getdate())
 	group by CONVERT(date, timestarted) 
 	order by CONVERT(date, timestarted) desc";
-                    var res = db.Database.SqlQuery<GrowthStat>(sql).ToList();
+                    var res = db.Database.SqlQuery<GameCountStat>(sql).ToList();
                     res.Reverse();
                     var ds = new DataSet();
                     var dt = new DataTable();
@@ -287,7 +292,7 @@ namespace SixNimmtBot
                         dt.Rows.Add(row);
                     }
                     ds.Tables.Add(dt);
-                    var chart = CreateGameCountChart(ds);
+                    var chart = CreateChart(ds, $"Game Count for past {i} days", "GameDate", "Num", SeriesChartType.Spline, 400, 250);
                     using (MemoryStream ms = new MemoryStream())
                     {
                         chart.SaveImage(ms, ChartImageFormat.Png);
@@ -304,6 +309,59 @@ namespace SixNimmtBot
             }
         }
 
-       
+        [Attributes.Command(Trigger = "groupact", DevOnly = true)]
+        public static void CheckGroupActivity(Message msg, string[] args)
+        {
+            var i = 7;
+            if (args[1] != null)
+            {
+                int.TryParse(args[1].Split()[0], out i);
+            }
+            using (var db = new SixNimmtDb())
+            {
+                try
+                {
+                    var sql = $@"
+    select top 10
+	count(*) as [Num], [group].name as [Name]
+	from game
+	join [group] on game.grpid = [group].id
+	where timeended is not null 
+	and convert(date, timestarted) <> convert(date, getdate())
+	and timeended > DATEADD(DAY, {-i}, getdate())
+	group by [group].name
+	order by count(*) desc";
+                    var res = db.Database.SqlQuery<GroupGameCountStat>(sql).ToList();
+                    res.Reverse();
+                    var ds = new DataSet();
+                    var dt = new DataTable();
+                    dt.Columns.Add("Num", typeof(int));
+                    dt.Columns.Add("Name", typeof(string));
+
+
+                    foreach (var r in res)
+                    {
+                        var row = dt.NewRow();
+                        row[0] = r.Num;
+                        row[1] = r.Name;
+                        dt.Rows.Add(row);
+                    }
+                    ds.Tables.Add(dt);
+                    var chart = CreateChart(ds, $"Group Activity for past {i} days", "Name", "Num", SeriesChartType.Bar, 800, 500);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        chart.SaveImage(ms, ChartImageFormat.Png);
+                        ms.Seek(0, SeekOrigin.Begin);
+                        var image = new FileToSend("growth", ms);
+                        Bot.Api.SendPhotoAsync(msg.Chat.Id, image, replyToMessageId: msg.MessageId).Wait();
+                    }
+                }
+                catch (Exception e)
+                {
+                    //
+                }
+                //
+            }
+        }
     }
 }

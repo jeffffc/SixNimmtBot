@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace SixNimmtBot.Models.General
 {
-    public class GrowthStat
+    public class GameCountStat
     {
         public DateTime GameDate { get; set; }
         public int Num { get; set; }
+    }
+
+    public class GroupGameCountStat
+    {
+        public int Num { get; set; }
+        public string Name { get; set; }
     }
 }
