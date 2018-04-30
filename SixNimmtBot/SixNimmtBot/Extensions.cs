@@ -188,10 +188,10 @@ namespace SixNimmtBot
                     x = "8️⃣";
                     break;
                 case 9:
-                    x = "";
+                    x = "9️⃣";
                     break;
                 case 10:
-                    x = "9️⃣🔟";
+                    x = "🔟";
                     break;
             }
             return $"▂▃▅▇{x}▇▅▄▃";
