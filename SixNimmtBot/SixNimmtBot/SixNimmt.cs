@@ -530,6 +530,7 @@ namespace SixNimmtBot
                             else
                                 SendSticker(p, CurrentTableStickerId);
                             SendMenu(p, GetTranslation("ChooseCard"), GenerateMenu(p, p.CardsInHand.OrderBy(x => x.Number).ToList()));
+
                         }
                         else
                         {
@@ -955,32 +956,64 @@ namespace SixNimmtBot
 
         public Message SendPM(SNPlayer p, string msg, InlineKeyboardMarkup markup = null)
         {
-            return Bot.Send(p.TelegramId, msg, markup);
+            try
+            {
+                return Bot.Send(p.TelegramId, msg, markup);
+            }
+            catch (Exception e)
+            {
+                e.LogError(p.TelegramId);
+                return new Message();
+            }
         }
 
         public Message SendMenu(SNPlayer p, string msg, InlineKeyboardMarkup markup)
         {
-            var sent = Bot.Send(p.TelegramId, msg, markup);
-            p.CurrentQuestion = new QuestionAsked
+            try
             {
-                MessageId = sent.MessageId
-            };
-            return sent;
+                var sent = Bot.Send(p.TelegramId, msg, markup);
+                p.CurrentQuestion = new QuestionAsked
+                {
+                    MessageId = sent.MessageId
+                };
+                return sent;
+            }
+            catch (Exception e)
+            {
+                e.LogError(p.TelegramId);
+                return new Message();
+            }
         }
 
         public Message SendSticker(SNPlayer p, string fileId)
         {
-            return Bot.SendSticker(p.TelegramId, fileId);
+            try
+            {
+                return Bot.SendSticker(p.TelegramId, fileId);
+            }
+            catch (Exception e)
+            {
+                e.LogError(p.TelegramId);
+                return new Message();
+            }
         }
 
         public Message SendStickerMenu(SNPlayer p, string fileId, InlineKeyboardMarkup markup)
         {
-            var sent = Bot.SendSticker(p.TelegramId, fileId, markup);
-            p.CurrentQuestion = new QuestionAsked
+            try
             {
-                MessageId = sent.MessageId
-            };
-            return sent;
+                var sent = Bot.SendSticker(p.TelegramId, fileId, markup);
+                p.CurrentQuestion = new QuestionAsked
+                {
+                    MessageId = sent.MessageId
+                };
+                return sent;
+            }
+            catch (Exception e)
+            {
+                e.LogError(p.TelegramId);
+                return new Message();
+            }
         }
 
         public Message Reply(int oldMessageId, string msg)
