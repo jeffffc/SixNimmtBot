@@ -819,10 +819,12 @@ namespace SixNimmtBot
                 p.FinalScore = p.Score + p.AFKPenalties;
             }
             var finalPlayersGrouped = Players.GroupBy(x => x.FinalScore).OrderByDescending(x => x.Key).ToList();
-            foreach (var score in finalPlayersGrouped)
+
+            var scoreMsgs = new List<string>();
+            for (int i = 0; i < finalPlayersGrouped.Count; i++)
             {
-                var thisScoreMsg = "";
-                foreach (var p in score)
+                var thisScoreMsg = (finalPlayersGrouped.Count - i).ToEmoji() + Environment.NewLine;
+                foreach (var p in finalPlayersGrouped[i])
                 {
                     if (p.AFKPenalties > 0)
                         thisScoreMsg += GetTranslation("PlayerBullWithAFK", p.GetMention(), p.AFKPenalties, p.Score, p.FinalScore);
@@ -830,9 +832,23 @@ namespace SixNimmtBot
                         thisScoreMsg += GetTranslation("PlayerBull", p.GetMention(), p.Score);
                     thisScoreMsg += Environment.NewLine;
                 }
-                Send(thisScoreMsg);
-                Thread.Sleep(5000); // slow down ending 
+                scoreMsgs.Add(thisScoreMsg);
             }
+
+            int every = 1;
+            if (Players.Count >= 7)
+                every = 2;
+            for (int i = 0; i < scoreMsgs.Count; i += every)
+            {
+                var items = scoreMsgs.Skip(i).Take(every);
+                // Do something with 100 or remaining items
+                var toSend = items.Aggregate((x, y) => x + Environment.NewLine + Environment.NewLine + y);
+
+                Send(toSend);
+                Thread.Sleep(5000); // slow down ending 
+
+            }
+
 
             var wonPlayers = finalPlayersGrouped.Last().ToList();
             Send($"{wonPlayers.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y)} {GetTranslation("Won")}");

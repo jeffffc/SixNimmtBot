@@ -158,5 +158,43 @@ namespace SixNimmtBot
             return deck.Cards.Pop();
         }
 
+        public static string ToEmoji(this int num)
+        {
+            var x = "";
+            switch (num)
+            {
+                case 1:
+                    x = "🥇";
+                    break;
+                case 2:
+                    x = "🥈";
+                    break;
+                case 3:
+                    x = "🥉";
+                    break;
+                case 4:
+                    x = "4⃣";
+                    break;
+                case 5:
+                    x = "5⃣";
+                    break;
+                case 6:
+                    x = "6️⃣";
+                    break;
+                case 7:
+                    x = "7️⃣";
+                    break;
+                case 8:
+                    x = "8️⃣";
+                    break;
+                case 9:
+                    x = "";
+                    break;
+                case 10:
+                    x = "9️⃣🔟";
+                    break;
+            }
+            return $"▂▃▅▇{x}▇▅▄▃";
+        }
     }
 }
