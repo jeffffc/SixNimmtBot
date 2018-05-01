@@ -981,7 +981,7 @@ namespace SixNimmtBot
             catch (Exception e)
             {
                 e.LogError(p.TelegramId);
-                return new Message();
+                return null;
             }
         }
 
