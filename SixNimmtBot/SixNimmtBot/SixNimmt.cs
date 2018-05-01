@@ -320,6 +320,8 @@ namespace SixNimmtBot
                     try
                     {
                         ret = SendPM(p, GetTranslation("YouJoined", GroupName), GroupMarkup);
+                        if (ret == null)
+                            throw new Exception();
                     }
                     catch
                     {
