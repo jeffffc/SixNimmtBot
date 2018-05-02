@@ -194,7 +194,7 @@ namespace SixNimmtBot
                     x = "🔟";
                     break;
             }
-            return $"▂▃▅▇{x}▇▅▄▃";
+            return $"▃▄▅▇{x}▇▅▄▃";
         }
     }
 }
