@@ -289,6 +289,8 @@ namespace SixNimmtBot
             var player = this.Players.FirstOrDefault(x => x.TelegramId == u.Id);
             if (player != null)
                 return;
+            if (Players.Count >= Constants.MaxPlayer)
+                return;
 
             using (var db = new SixNimmtDb())
             {
