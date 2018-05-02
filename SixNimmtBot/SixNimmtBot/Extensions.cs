@@ -54,12 +54,15 @@ namespace SixNimmtBot
         }
 
 
-        public static void LogError(this Exception e, long? chatId = null)
+        public static void LogError(this Exception e, long? chatId = null, long? userId = null, bool noStackTrace = false)
         {
             string m = "Error occured." + Environment.NewLine;
             if (chatId != null)
                 m += $"ChatId: {chatId}" + Environment.NewLine + Environment.NewLine;
+            if (userId != null)
+                m += $"UserId: {userId}" + Environment.NewLine + Environment.NewLine;
             var trace = e.StackTrace;
+
             do
             {
                 m += e.Message + Environment.NewLine + Environment.NewLine;
@@ -67,7 +70,8 @@ namespace SixNimmtBot
             }
             while (e != null);
 
-            m += trace;
+            if (!noStackTrace)
+                m += trace;
 
             Bot.Send(Constants.LogGroupId, m, parseMode: ParseMode.Default);
         }
