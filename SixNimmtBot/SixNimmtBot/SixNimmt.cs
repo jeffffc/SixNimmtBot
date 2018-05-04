@@ -982,7 +982,7 @@ namespace SixNimmtBot
             }
             catch (Exception e)
             {
-                e.LogError(ChatId, p.TelegramId, true);
+                // e.LogError(ChatId, p.TelegramId, true);
                 return null;
             }
         }
@@ -1000,7 +1000,7 @@ namespace SixNimmtBot
             }
             catch (Exception e)
             {
-                e.LogError(ChatId, p.TelegramId, true);
+                // e.LogError(ChatId, p.TelegramId, true);
                 return new Message();
             }
         }
@@ -1013,7 +1013,7 @@ namespace SixNimmtBot
             }
             catch (Exception e)
             {
-                e.LogError(ChatId, p.TelegramId, true);
+                // e.LogError(ChatId, p.TelegramId, true);
                 return new Message();
             }
         }
@@ -1031,7 +1031,7 @@ namespace SixNimmtBot
             }
             catch (Exception e)
             {
-                e.LogError(ChatId, p.TelegramId, true);
+                // e.LogError(ChatId, p.TelegramId, true);
                 return new Message();
             }
         }
