@@ -63,6 +63,8 @@ namespace SixNimmtBot
                 m += $"UserId: {userId}" + Environment.NewLine + Environment.NewLine;
             var trace = e.StackTrace;
 
+            if (e.Message.ToLower().Contains("request timed out")) return;
+
             do
             {
                 m += e.Message + Environment.NewLine + Environment.NewLine;
