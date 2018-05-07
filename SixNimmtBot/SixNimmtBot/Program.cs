@@ -35,7 +35,7 @@ namespace SixNimmtBot
             for (int i = 1; i <= 104; i++)
                 Constants.cardImages.Add(Image.FromFile(Path.Combine(Constants._imagePath, $"{i}.png")));
 
-            Bot.Api = new TelegramBotClient(Constants.GetBotToken("BotToken")) { Timeout = TimeSpan.FromSeconds(15) };
+            Bot.Api = new TelegramBotClient(Constants.GetBotToken("BotToken"));
             Bot.Me = Bot.Api.GetMeAsync().Result;
 
             Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
