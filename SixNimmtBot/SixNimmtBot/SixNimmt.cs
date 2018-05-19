@@ -195,6 +195,11 @@ namespace SixNimmtBot
                                 Send(GetTranslation("GameEnded"));
                                 return;
                             }
+                            do
+                            {
+                                Players.RemoveAt(Players.Count - 1);
+                            }
+                            while (Players.Count > Constants.MaxPlayer);
 
                             Bot.Send(ChatId,
                                 GetTranslation("GameStart",
@@ -249,7 +254,8 @@ namespace SixNimmtBot
                                     break;
                                 // NextPlayer();
                             }
-                            EndGame();
+                            if (Phase == GamePhase.Ending)
+                                EndGame();
                             #endregion
                         }
                         catch (Exception e)
@@ -316,6 +322,8 @@ namespace SixNimmtBot
                     Username = u.Username,
                     UseSticker = DbPlayer.UseSticker ?? false
                 };
+                if (Players.Count >= Constants.MaxPlayer)
+                    return;
                 try
                 {
                     Message ret;
@@ -332,6 +340,8 @@ namespace SixNimmtBot
                     }
                 }
                 catch { }
+                if (Players.Count >= Constants.MaxPlayer)
+                    return;
                 this.Players.Add(p);
             }
             if (!newGame)
@@ -763,6 +773,7 @@ namespace SixNimmtBot
             catch (Exception ex)
             {
                 Log(ex);
+                Phase = GamePhase.KillGame;
             }
         }
 

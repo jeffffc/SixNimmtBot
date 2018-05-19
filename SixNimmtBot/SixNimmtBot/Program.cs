@@ -73,9 +73,9 @@ namespace SixNimmtBot
 
             Bot.Api.GetUpdatesAsync(-1).Wait();
             Handler.HandleUpdates(Bot.Api);
-            Bot.Api.StartReceiving();
             Startup = DateTime.Now;
             new Thread(UpdateConsole).Start();
+            Bot.Api.StartReceiving();
             Console.ReadLine();
             Bot.Api.StopReceiving();
         }
