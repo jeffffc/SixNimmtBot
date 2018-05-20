@@ -195,11 +195,11 @@ namespace SixNimmtBot
                                 Send(GetTranslation("GameEnded"));
                                 return;
                             }
-                            do
+                            while (Players.Count > Constants.MaxPlayer)
                             {
                                 Players.RemoveAt(Players.Count - 1);
                             }
-                            while (Players.Count > Constants.MaxPlayer);
+                            
 
                             Bot.Send(ChatId,
                                 GetTranslation("GameStart",
