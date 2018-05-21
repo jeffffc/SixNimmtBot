@@ -2,6 +2,7 @@
 Six Nimmt Bot for Telegram using C#
 
 [![Build Status](https://rmsprodscussu1.vsrm.visualstudio.com/A8fc85661-2b89-43ad-bd3c-9a5d8da7d34c/_apis/public/Release/badge/b8752e7a-9c6a-4fdc-822b-495b2d264ee0/1/1)](https://github.com/jeffffc/SixNimmtBot)
+[![Build status](https://ci.appveyor.com/api/projects/status/4chp9oc2meoscgl4?svg=true)](https://ci.appveyor.com/project/jeffffc/sixnimmtbot)
 
 ## Requirements
 - .Net Framework 4.5.2
