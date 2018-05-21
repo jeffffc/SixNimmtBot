@@ -250,7 +250,7 @@ namespace SixNimmtBot
                             {
                                 // _playerList = Send(GeneratePlayerList()).MessageId;
                                 PlayersChooseCard();
-                                if (Phase == GamePhase.Ending)
+                                if (Phase == GamePhase.Ending || Phase == GamePhase.KillGame)
                                     break;
                                 // NextPlayer();
                             }
@@ -521,7 +521,7 @@ namespace SixNimmtBot
                 if (Players.All(x => x.CardsInHand.Count == 0))
                     Phase = GamePhase.Ending;
 
-                if (Phase == GamePhase.Ending) return;
+                if (Phase == GamePhase.Ending || Phase == GamePhase.KillGame) return;
 
                 var firstMsg = GetTranslation("Round", Round).ToBold();
                 if (Players.All(x => x.CardsInHand.Count == 1))
