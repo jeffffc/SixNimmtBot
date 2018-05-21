@@ -31,9 +31,9 @@ namespace SixNimmtBot.Handlers
             {
                 var pcq = updateEventArgs.Update.PreCheckoutQuery;
                 if (pcq.InvoicePayload != (Constants.DonationPayload + pcq.From.Id.ToString()))
-                    Bot.Api.AnswerPreCheckoutQueryAsync(pcq.Id, false, GetTranslation("DonateError", GetLanguage(pcq.From.Id)));
+                    Bot.Api.AnswerPreCheckoutQueryAsync(pcq.Id, GetTranslation("DonateError", GetLanguage(pcq.From.Id)));
                 else
-                    Bot.Api.AnswerPreCheckoutQueryAsync(pcq.Id, true);
+                    Bot.Api.AnswerPreCheckoutQueryAsync(pcq.Id);
             }
         }
 

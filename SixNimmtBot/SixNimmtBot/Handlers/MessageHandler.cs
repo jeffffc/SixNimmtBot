@@ -17,7 +17,7 @@ namespace SixNimmtBot.Handlers
             if (msg.Date.ToUniversalTime() < Program.Startup.ToUniversalTime()) return;
             switch (msg.Type)
             {
-                case MessageType.TextMessage:
+                case MessageType.Text:
                     string text = msg.Text;
                     string[] args = text.Contains(' ')
                                     ? new[] { text.Split(' ')[0].ToLower(), text.Remove(0, text.IndexOf(' ') + 1) }
@@ -66,18 +66,14 @@ namespace SixNimmtBot.Handlers
                         }
                     }
                     break;
-                case MessageType.ServiceMessage:
+                case MessageType.ChatMembersAdded:
                     bool me = false;
-                    if (msg.NewChatMembers.Any())
-                    {
-                        foreach (var c in msg.NewChatMembers)
-                        {
-                            if (c.Id == Bot.Me.Id)
-                                me = true;
-                        }
-                    }
-                    if (msg.NewChatMember != null && msg.NewChatMember.Id == Bot.Me.Id)
+                    if (msg.NewChatMembers.Any(x => x.Id == Bot.Me.Id))
                         me = true;
+   
+
+                    // if (msg.NewChatMember != null && msg.NewChatMember.Id == Bot.Me.Id)
+                    //     me = true;
 
                     if (me)
                     {

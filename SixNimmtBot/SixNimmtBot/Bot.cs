@@ -1,6 +1,7 @@
 ﻿using SixNimmtBot.Models.General;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Text;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SixNimmtBot
@@ -34,12 +34,12 @@ namespace SixNimmtBot
             return BotMethods.SendSticker(chatId, fileId, replyMarkup, disableNotification);
         }
 
-        internal static Message SendSticker(long chatId, FileToSend sticker, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
+        internal static Message SendSticker(long chatId, Stream sticker, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
         {
             return BotMethods.SendSticker(chatId, sticker, replyMarkup, disableNotification);
         }
 
-        internal static Message Edit(long chatId, int oldMessageId, string text, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
+        internal static Message Edit(long chatId, int oldMessageId, string text, InlineKeyboardMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
         {
             try
             {
@@ -142,10 +142,10 @@ namespace SixNimmtBot
 
         public static Message SendSticker(long chatId, string fileId, IReplyMarkup replyMarkup = null, bool disableNotification = false)
         {
-            return Bot.Api.SendStickerAsync(chatId, new FileToSend(fileId), disableNotification, 0, replyMarkup).Result;
+            return Bot.Api.SendStickerAsync(chatId, fileId, disableNotification, 0, replyMarkup).Result;
         }
 
-        public static Message SendSticker(long chatId, FileToSend sticker, IReplyMarkup replyMarkup = null, bool disableNotification = false)
+        public static Message SendSticker(long chatId, Stream sticker, IReplyMarkup replyMarkup = null, bool disableNotification = false)
         {
             return Bot.Api.SendStickerAsync(chatId, sticker, disableNotification, 0, replyMarkup).Result;
         }
@@ -199,7 +199,7 @@ namespace SixNimmtBot
                     if (r == null)
                     {
                         m.Reply(Helpers.GetTranslation("NotStartedBot", Helpers.GetLanguage(m.From.Id)), new InlineKeyboardMarkup(new InlineKeyboardButton[] {
-                            new InlineKeyboardUrlButton("Start me!", $"https://t.me/{Bot.Me.Username}") }));
+                            InlineKeyboardButton.WithUrl("Start me!", $"https://t.me/{Bot.Me.Username}") }));
                         return;
                     }
                 }
@@ -220,7 +220,7 @@ namespace SixNimmtBot
                 if (r == null)
                 {
                     return m.Reply(Helpers.GetTranslation("NotStartedBot", Helpers.GetLanguage(m.From.Id)), new InlineKeyboardMarkup(new InlineKeyboardButton[] {
-                        new InlineKeyboardUrlButton("Start me!", $"https://t.me/{Bot.Me.Username}") }));
+                        InlineKeyboardButton.WithUrl("Start me!", $"https://t.me/{Bot.Me.Username}") }));
                 }
                 if (m.Chat.Type != ChatType.Private)
                     m.Reply(Helpers.GetTranslation("SentPM", Helpers.GetLanguage(m.From.Id)));
@@ -239,7 +239,7 @@ namespace SixNimmtBot
         }
 
 
-        public static Message Edit(long chatId, int oldMessageId, string text, IReplyMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
+        public static Message Edit(long chatId, int oldMessageId, string text, InlineKeyboardMarkup replyMarkup = null, ParseMode parseMode = ParseMode.Html, bool disableWebPagePreview = true, bool disableNotification = false)
         {
             try
             {
@@ -265,11 +265,24 @@ namespace SixNimmtBot
             }
         }
 
-        public static Message SendDocument(long chatId, FileToSend fileToSend, string caption = null, IReplyMarkup replyMarkup = null, bool disableNotification = false)
+        public static Message SendDocument(long chatId, string fileToSend, string caption = null, IReplyMarkup replyMarkup = null, bool disableNotification = false)
         {
             try
             {
-                return Bot.Api.SendDocumentAsync(chatId, fileToSend, caption, disableNotification, 0, replyMarkup).Result;
+                return Bot.Api.SendDocumentAsync(chatId, fileToSend, caption, ParseMode.Default, disableNotification, 0, replyMarkup).Result;
+            }
+            catch (Exception e)
+            {
+                e.LogError();
+                return null;
+            }
+        }
+
+        public static Message SendDocument(long chatId, Stream fileToSend, string caption = null, IReplyMarkup replyMarkup = null, bool disableNotification = false)
+        {
+            try
+            {
+                return Bot.Api.SendDocumentAsync(chatId, fileToSend, caption, ParseMode.Default, disableNotification, 0, replyMarkup).Result;
             }
             catch (Exception e)
             {
@@ -284,8 +297,7 @@ namespace SixNimmtBot
         {
             try
             {
-                var t = Bot.Api.AnswerCallbackQueryAsync(query.Id, text, popup);
-                t.Wait();
+                var t = (Task<bool>)Bot.Api.AnswerCallbackQueryAsync(query.Id, text, popup);
                 return t.Result;            // Await this call in order to be sure it is sent in time
             }
             catch (Exception e)
