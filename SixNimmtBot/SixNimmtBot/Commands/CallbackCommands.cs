@@ -12,6 +12,7 @@ using Telegram.Bot.Types;
 using Database;
 using SixNimmtBot.Handlers;
 using static SixNimmtBot.Helpers;
+using Telegram.Bot.Types.InputFiles;
 
 namespace SixNimmtBot
 {
@@ -221,7 +222,7 @@ namespace SixNimmtBot
                     using (var sr = new StreamReader(Path.Combine(Constants.GetLangDirectory(), lang)))
                     {
                         // var file = new FileToSend(lang, sr.BaseStream);
-                        BotMethods.SendDocument(query.Message.Chat.Id, sr.BaseStream);
+                        BotMethods.SendDocument(query.Message.Chat.Id, new InputOnlineFile(sr.BaseStream, lang));
                     }
                 }
             }

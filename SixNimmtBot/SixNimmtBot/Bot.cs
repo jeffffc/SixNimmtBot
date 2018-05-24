@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SixNimmtBot
@@ -279,6 +280,19 @@ namespace SixNimmtBot
         }
 
         public static Message SendDocument(long chatId, Stream fileToSend, string caption = null, IReplyMarkup replyMarkup = null, bool disableNotification = false)
+        {
+            try
+            {
+                return Bot.Api.SendDocumentAsync(chatId, fileToSend, caption, ParseMode.Default, disableNotification, 0, replyMarkup).Result;
+            }
+            catch (Exception e)
+            {
+                e.LogError();
+                return null;
+            }
+        }
+
+        public static Message SendDocument(long chatId, InputOnlineFile fileToSend, string caption = null, IReplyMarkup replyMarkup = null, bool disableNotification = false)
         {
             try
             {
