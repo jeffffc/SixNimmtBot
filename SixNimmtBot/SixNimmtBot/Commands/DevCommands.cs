@@ -113,7 +113,7 @@ namespace SixNimmtBot
             try
             {
                 var id = msg.Chat.Id;
-                if (msg.ReplyToMessage?.Type != MessageType.DocumentMessage)
+                if (msg.ReplyToMessage?.Type != MessageType.Document)
                 {
                     Bot.Send(id, "Please reply to the file with /uploadlang");
                     return;
@@ -297,8 +297,8 @@ namespace SixNimmtBot
                     {
                         chart.SaveImage(ms, ChartImageFormat.Png);
                         ms.Seek(0, SeekOrigin.Begin);
-                        var image = new FileToSend("growth", ms);
-                        Bot.Api.SendPhotoAsync(msg.Chat.Id, image, replyToMessageId: msg.MessageId).Wait();
+                        // var image = new FileToSend("growth", ms);
+                        Bot.Api.SendPhotoAsync(msg.Chat.Id, ms, replyToMessageId: msg.MessageId).Wait();
                     }
                 }
                 catch (Exception e)
@@ -352,8 +352,8 @@ namespace SixNimmtBot
                     {
                         chart.SaveImage(ms, ChartImageFormat.Png);
                         ms.Seek(0, SeekOrigin.Begin);
-                        var image = new FileToSend("growth", ms);
-                        Bot.Api.SendPhotoAsync(msg.Chat.Id, image, replyToMessageId: msg.MessageId).Wait();
+                        // var image = new FileToSend("growth", ms);
+                        Bot.Api.SendPhotoAsync(msg.Chat.Id, ms, replyToMessageId: msg.MessageId).Wait();
                     }
                 }
                 catch (Exception e)

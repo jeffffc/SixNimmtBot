@@ -12,7 +12,6 @@ using System.Threading;
 using Database;
 using System.Diagnostics;
 using System.IO;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using System.Xml.Linq;
 using static SixNimmtBot.Helpers;
 using System.Drawing;
@@ -76,15 +75,15 @@ namespace SixNimmtBot
                 if (GroupLink != null)
                     GroupMarkup = new InlineKeyboardMarkup(
                         new InlineKeyboardButton[][] {
-                            new InlineKeyboardUrlButton[] {
-                                new InlineKeyboardUrlButton(GetTranslation("BackGroup", GroupName), GroupLink)
+                            new InlineKeyboardButton[] {
+                                InlineKeyboardButton.WithUrl(GetTranslation("BackGroup", GroupName), GroupLink)
                             }
                         });
                 LoadLanguage(DbGroup.Language);
                 BotMarkup = new InlineKeyboardMarkup(
                     new InlineKeyboardButton[][] {
                         new InlineKeyboardButton[] {
-                            new InlineKeyboardUrlButton(GetTranslation("GoToBot"), $"https://t.me/{Bot.Me.Username}")
+                            InlineKeyboardButton.WithUrl(GetTranslation("GoToBot"), $"https://t.me/{Bot.Me.Username}")
                         }
                     });
                 if (DbGroup == null)
@@ -412,36 +411,36 @@ namespace SixNimmtBot
                 Send(TextToTable(TableCards));
             // Bot.Api.SendPhotoAsync(ChatId, GetTableCardsImage(TableCards)).Wait();
             else
-                CurrentTableStickerId = Bot.SendSticker(ChatId, GetTableCardsImage(TableCards)).Sticker.FileId;
+            {
+                using (var stream = GetTableCardsImage(TableCards))
+                    CurrentTableStickerId = Bot.SendSticker(ChatId, stream).Sticker.FileId;
+            }
             PauseSendingTableCards = false;
         }
 
-        public FileToSend GetTableCardsImage(List<SNCard[]> cards)
+        public Stream GetTableCardsImage(List<SNCard[]> cards)
         {
-            using (MemoryStream ms = new MemoryStream())
+            Image temp = (Image)Constants.boardImage.Clone();
+            Graphics board = Graphics.FromImage(temp);
+
+            int w = Constants.widthSides;
+            int h = Constants.heightSides;
+            for (int i = 0; i < 5; i++)
             {
-                Image temp = (Image)Constants.boardImage.Clone();
-                Graphics board = Graphics.FromImage(temp);
-
-                int w = Constants.widthSides;
-                int h = Constants.heightSides;
-                for (int i = 0; i < 5; i++)
+                for (int j = 0; j < 4; j++)
                 {
-                    for (int j = 0; j < 4; j++)
-                    {
-                        var c = cards[j][i];
-                        if (c != null)
-                            board.DrawImage(Constants.cardImages[c.Number - 1], w, h);
-                        h += Constants.eachHeight;
-                    }
-                    w += Constants.eachWidth;
-                    h = Constants.heightSides;
+                    var c = cards[j][i];
+                    if (c != null)
+                        board.DrawImage(Constants.cardImages[c.Number - 1], w, h);
+                    h += Constants.eachHeight;
                 }
-
-                var s = ToStream(temp, ImageFormat.Jpeg);
-                // boardImage.Save(outputPath);
-                return new FileToSend("sticker", s);
+                w += Constants.eachWidth;
+                h = Constants.heightSides;
             }
+
+            var s = ToStream(temp, ImageFormat.Jpeg);
+            // boardImage.Save(outputPath);
+            return s;
         }
 
         private Stream ToStream(Image image, ImageFormat format)
@@ -944,7 +943,7 @@ namespace SixNimmtBot
                     SendPM(p, achvMsg);
                     // special gif for HeyCorgi
                     if (newAchv.HasFlag(Achievements.HeyCorgi))
-                        BotMethods.SendDocument(p.TelegramId, new FileToSend("CgADBAAD1wsAAmEYZAdA_htb0nUQkAI"), "");
+                        BotMethods.SendDocument(p.TelegramId, "CgADBAAD1wsAAmEYZAdA_htb0nUQkAI", "");
                 }
             }
         }
@@ -1056,7 +1055,7 @@ namespace SixNimmtBot
         {
             var row = new List<InlineKeyboardButton>();
             var rows = new List<InlineKeyboardButton[]>();
-            row.Add(new InlineKeyboardUrlButton(GetTranslation("StartMe"), $"https://telegram.me/{Bot.Me.Username}"));
+            row.Add(InlineKeyboardButton.WithUrl(GetTranslation("StartMe"), $"https://telegram.me/{Bot.Me.Username}"));
             rows.Add(row.ToArray());
             return new InlineKeyboardMarkup(rows.ToArray());
         }
@@ -1082,7 +1081,7 @@ namespace SixNimmtBot
                 row.Clear();
                 var subButtons = buttons.Skip(i).Take(2).ToList();
                 foreach (var button in subButtons)
-                    row.Add(new InlineKeyboardCallbackButton(button.Item1, button.Item2));
+                    row.Add(InlineKeyboardButton.WithCallbackData(button.Item1, button.Item2));
                 rows.Add(row.ToArray());
             }
             return new InlineKeyboardMarkup(rows.ToArray());
@@ -1110,7 +1109,7 @@ namespace SixNimmtBot
             for (int i = 0; i < buttons.Count; i++)
             {
                 row.Clear();
-                row.Add(new InlineKeyboardCallbackButton(buttons[i].Item1, buttons[i].Item2));
+                row.Add(InlineKeyboardButton.WithCallbackData(buttons[i].Item1, buttons[i].Item2));
                 rows.Add(row.ToArray());
             }
             return new InlineKeyboardMarkup(rows.ToArray());

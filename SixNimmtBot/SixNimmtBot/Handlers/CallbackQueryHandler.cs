@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Database;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.IO;
 using System.Diagnostics;
@@ -70,16 +69,16 @@ namespace SixNimmtBot.Handlers
         {
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton> { };
             //base menu
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigChangeLanguage", GetLanguage(id)), $"config|lang|{id}"));
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigTableCard", GetLanguage(id)), $"config|table|{id}"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigChangeLanguage", GetLanguage(id)), $"config|lang|{id}"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigTableCard", GetLanguage(id)), $"config|table|{id}"));
             // for group only
             if (id < 0)
             {
-                buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigCardDeck", GetLanguage(id)), $"config|deck|{id}"));
-                buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigChooseCardTime", GetLanguage(id)), $"config|choosetime|{id}"));
-                buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigGroupList", GetLanguage(id)), $"config|grouplist|{id}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigCardDeck", GetLanguage(id)), $"config|deck|{id}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigChooseCardTime", GetLanguage(id)), $"config|choosetime|{id}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigGroupList", GetLanguage(id)), $"config|grouplist|{id}"));
             }
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigDone", GetLanguage(id)), $"config|done|{id}"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigDone", GetLanguage(id)), $"config|done|{id}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -107,7 +106,7 @@ namespace SixNimmtBot.Handlers
                 }
 
                 foreach (var i in new string[] { GetTranslation("ChooseUseText", GetLanguage(id)), GetTranslation("ChooseUseSticker", GetLanguage(id)) })
-                    buttons.Add(new InlineKeyboardCallbackButton(i, currentSetting != true ? $"config|table|{id}|sticker" : $"config|table|{id}|text"));
+                    buttons.Add(InlineKeyboardButton.WithCallbackData(i, currentSetting != true ? $"config|table|{id}|sticker" : $"config|table|{id}|text"));
                 var twoMenu = new List<InlineKeyboardButton[]>();
                 for (var i = 0; i < buttons.Count; i++)
                 {
@@ -119,7 +118,7 @@ namespace SixNimmtBot.Handlers
                         twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
                     i++;
                 }
-                twoMenu.Add(new[] { new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
+                twoMenu.Add(new[] { InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
 
                 var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
                 return menu;
@@ -131,8 +130,8 @@ namespace SixNimmtBot.Handlers
         {
             var langs = Program.Langs.Values;
             //create a menu out of this
-            List<InlineKeyboardCallbackButton> buttons = langs.OrderBy(x => x.Language).
-                Select(x => new InlineKeyboardCallbackButton(
+            List<InlineKeyboardButton> buttons = langs.OrderBy(x => x.Language).
+                Select(x => InlineKeyboardButton.WithCallbackData(
                     x.LanguageName, $"grouplist|{id}|{x.Language}")).ToList();
 
             var baseMenu = new List<InlineKeyboardButton[]>();
@@ -146,7 +145,7 @@ namespace SixNimmtBot.Handlers
                     baseMenu.Add(new[] { buttons[i], buttons[i + 1] });
                 i++;
             }
-            baseMenu.Add(new InlineKeyboardCallbackButton[] { new InlineKeyboardCallbackButton(GetTranslation("ConfigDone", GetLanguage(id)), $"grouplist|{id}|done") });
+            baseMenu.Add(new[] { InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigDone", GetLanguage(id)), $"grouplist|{id}|done") });
             return new InlineKeyboardMarkup(baseMenu.ToArray());
         }
 
@@ -155,7 +154,7 @@ namespace SixNimmtBot.Handlers
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
             //base menu
             foreach (var lang in Program.Langs.Values)
-                buttons.Add(new InlineKeyboardCallbackButton(lang.LanguageName, !setlang ? $"config|lang|{id}|{lang.Language}" : $"setlang|lang|{id}|{lang.Language}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(lang.LanguageName, !setlang ? $"config|lang|{id}|{lang.Language}" : $"setlang|lang|{id}|{lang.Language}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -168,7 +167,7 @@ namespace SixNimmtBot.Handlers
                 i++;
             }
             if (!setlang)
-                twoMenu.Add(new[] { new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
+                twoMenu.Add(new[] { InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;
@@ -179,7 +178,7 @@ namespace SixNimmtBot.Handlers
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
             //base menu
             foreach (var lang in Program.Langs.Values)
-                buttons.Add(new InlineKeyboardCallbackButton(lang.LanguageName, $"getlang|get|{lang.Language}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(lang.LanguageName, $"getlang|get|{lang.Language}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -191,7 +190,7 @@ namespace SixNimmtBot.Handlers
                     twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
                 i++;
             }
-            twoMenu.Add(new[] { new InlineKeyboardCallbackButton("Cancel", $"getlang|cancel") });
+            twoMenu.Add(new[] { InlineKeyboardButton.WithCallbackData("Cancel", $"getlang|cancel") });
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;
@@ -201,9 +200,9 @@ namespace SixNimmtBot.Handlers
         {
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton> { };
             //base menu
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigStaticDeck", GetLanguage(id)), $"config|deck|{id}|static"));
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigDynamicDeck", GetLanguage(id)), $"config|deck|{id}|dynamic"));
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigStaticDeck", GetLanguage(id)), $"config|deck|{id}|static"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigDynamicDeck", GetLanguage(id)), $"config|deck|{id}|dynamic"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -218,9 +217,9 @@ namespace SixNimmtBot.Handlers
         {
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton> { };
             //base menu
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigYes", GetLanguage(id)), $"config|grouplist|{id}|yes"));
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigNo", GetLanguage(id)), $"config|grouplist|{id}|no"));
-            buttons.Add(new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigYes", GetLanguage(id)), $"config|grouplist|{id}|yes"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigNo", GetLanguage(id)), $"config|grouplist|{id}|no"));
+            buttons.Add(InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}"));
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
             {
@@ -237,7 +236,7 @@ namespace SixNimmtBot.Handlers
             var times = new string[] { "30", "45", "60", "75", "90" };
             //base menu
             foreach (var t in times)
-                buttons.Add(new InlineKeyboardCallbackButton(t, $"config|choosetime|{id}|{t}"));
+                buttons.Add(InlineKeyboardButton.WithCallbackData(t, $"config|choosetime|{id}|{t}"));
 
             var twoMenu = new List<InlineKeyboardButton[]>();
             for (var i = 0; i < buttons.Count; i++)
@@ -250,7 +249,7 @@ namespace SixNimmtBot.Handlers
                     twoMenu.Add(new[] { buttons[i], buttons[i + 1] });
                 i++;
             }
-            twoMenu.Add(new[] { new InlineKeyboardCallbackButton(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
+            twoMenu.Add(new[] { InlineKeyboardButton.WithCallbackData(GetTranslation("ConfigBack", GetLanguage(id)), $"config|back|{id}") });
 
             var menu = new InlineKeyboardMarkup(twoMenu.ToArray());
             return menu;

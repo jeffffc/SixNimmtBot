@@ -220,10 +220,25 @@ namespace SixNimmtBot
                     var lang = temp[1] + ".xml";
                     using (var sr = new StreamReader(Path.Combine(Constants.GetLangDirectory(), lang)))
                     {
-                        var file = new FileToSend(lang, sr.BaseStream);
-                        BotMethods.SendDocument(query.Message.Chat.Id, file);
+                        // var file = new FileToSend(lang, sr.BaseStream);
+                        BotMethods.SendDocument(query.Message.Chat.Id, sr.BaseStream);
                     }
                 }
+            }
+        }
+
+        [Callback(Trigger = "upload", DevOnly = true)]
+        public static void UploadLang(CallbackQuery call, string[] args)
+        {
+            var temp = args[1].Split('|');
+            switch (temp[1])
+            {
+                case "current":
+                    Bot.Edit(call.Message.Chat.Id, call.Message.MessageId, "OK, I will do nothing.");
+                    return;
+                default:
+                    UseNewLanguageFile(temp[1], call.Message.Chat.Id, call.Message.MessageId);
+                    return;
             }
         }
     }

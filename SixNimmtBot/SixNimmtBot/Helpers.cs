@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineKeyboardButtons;
 using Telegram.Bot.Types.ReplyMarkups;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing;
@@ -306,8 +305,8 @@ namespace SixNimmtBot
                 //load up each file and get the names
                 var buttons = new[]
                 {
-                    new InlineKeyboardCallbackButton($"New", $"upload|{id}|{newFile.FileName}"),
-                    new InlineKeyboardCallbackButton($"Old", $"upload|{id}|current")
+                    InlineKeyboardButton.WithCallbackData($"New", $"upload|{id}|{newFile.FileName}"),
+                    InlineKeyboardButton.WithCallbackData($"Old", $"upload|{id}|current")
                 };
                 var menu = new InlineKeyboardMarkup(buttons.ToArray());
                 Bot.Api.SendTextMessageAsync(id, "Which file do you want to keep?", replyToMessageId: msgID,
@@ -518,7 +517,7 @@ namespace SixNimmtBot
         {
             var row = new List<InlineKeyboardButton>();
             var rows = new List<InlineKeyboardButton[]>();
-            row.Add(new InlineKeyboardUrlButton(GetTranslation("StartMe", GetLanguage(id)), $"https://telegram.me/{Bot.Me.Username}"));
+            row.Add(InlineKeyboardButton.WithUrl(GetTranslation("StartMe", GetLanguage(id)), $"https://telegram.me/{Bot.Me.Username}"));
             rows.Add(row.ToArray());
             return new InlineKeyboardMarkup(rows.ToArray());
         }
