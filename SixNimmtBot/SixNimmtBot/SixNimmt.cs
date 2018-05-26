@@ -959,9 +959,13 @@ namespace SixNimmtBot
                     var toNotify = db.NotifyGames.Where(x => x.GroupId == grpId && x.UserId != Initiator.TelegramId).Select(x => x.UserId).ToList();
                     foreach (int user in toNotify)
                     {
-                        Bot.Send(user, GetTranslation("GameIsStarting", GroupLink != null ? $"<a href='{GroupLink}'>{GroupName}</a>" : GroupName), GroupMarkup);
+                        try
+                        {
+                            Bot.Send(user, GetTranslation("GameIsStarting", GroupLink != null ? $"<a href='{GroupLink}'>{GroupName}</a>" : GroupName), GroupMarkup);
+                        }
+                        catch { }
                     }
-                    db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GROUPID = {grpId}");
+                    var res = db.Database.ExecuteSqlCommand($"DELETE FROM NotifyGame WHERE GROUPID = {grpId}");
                     db.SaveChanges();
                 }
             }
