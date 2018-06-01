@@ -327,8 +327,8 @@ namespace SixNimmtBot
                     avg.ToString("F").ToBold()
                     */
                     // number of wins
-                    numOfWins.ToBold(),
-                    numOfLoss.ToBold(),
+                    $"{numOfWins} ({Math.Round((double)numOfWins * 100 / numOfGames, 0)}%)".ToBold(),
+                    $"{numOfLoss} ({Math.Round((double)numOfLoss * 100 / numOfGames, 0)}%)".ToBold(),
                     numOfBulls.ToBold(),
                     avg.ToString("F").ToBold()
                     );
@@ -373,7 +373,7 @@ namespace SixNimmtBot
                 var i = 1;
                 var temp = playerAverageBulls.ToList();
                 temp.Reverse();
-                temp = temp.Take(3).ToList();
+                temp = temp.Take(10).ToList();
                 foreach (var res in temp)
                 {
                     var name = res.Username == null ? res.Name.ToBold() : $"<a href='https://t.me/{res.Username}'>{res.Name}</a>";
@@ -383,7 +383,7 @@ namespace SixNimmtBot
                 }
                 var playerBullsText2 = "";
                 i = 1;
-                foreach (var res in playerAverageBulls.Take(3).ToList())
+                foreach (var res in playerAverageBulls.Take(10).ToList())
                 {
                     var name = res.Username == null ? res.Name.ToBold() : $"<a href='https://t.me/{res.Username}'>{res.Name}</a>";
                     var bulls = (decimal)res.average;
