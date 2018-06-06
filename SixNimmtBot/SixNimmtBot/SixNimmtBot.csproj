@@ -98,6 +98,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Telegram.Bot\src\Telegram.Bot\Telegram.Bot.csproj">
+      <Project>{12fd39cd-a6fd-4040-8c8b-8fabedd5fe0f}</Project>
+      <Name>Telegram.Bot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Database\Database.csproj">
       <Project>{bc6cbd8e-5c35-41c7-aa1a-eb6493ad9e67}</Project>
       <Name>Database</Name>
