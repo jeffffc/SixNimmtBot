@@ -103,7 +103,7 @@ namespace SixNimmtBot
         public static string GetMention(this SNPlayer player)
         {
             var name = player.Name;
-            return $"<a href=\"tg://user?id={player.TelegramId}\">{name.FormatHTML()}</a>";
+            return !player.Virtual ? $"<a href=\"tg://user?id={player.TelegramId}\">{name.FormatHTML()}</a>" : name.FormatHTML();
         }
 
         public static string GetMention(this User player)

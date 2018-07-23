@@ -163,5 +163,33 @@ namespace SixNimmtBot
                 game.HandleMessage(msg);
             }
         }
+
+        [Command(Trigger = "addvp", GroupOnly = true)]
+        public static void AddVirtualPlayer(Message msg, string[] args)
+        {
+            SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
+            if (game == null)
+            {
+                return;
+            }
+            else
+            {
+                game.HandleMessage(msg);
+            }
+        }
+
+        [Command(Trigger = "remvp", GroupOnly = true)]
+        public static void RemoveVirtualPlayer(Message msg, string[] args)
+        {
+            SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
+            if (game == null)
+            {
+                return;
+            }
+            else
+            {
+                game.HandleMessage(msg);
+            }
+        }
     }
 }

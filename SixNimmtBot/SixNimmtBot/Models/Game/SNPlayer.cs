@@ -12,6 +12,7 @@ namespace SixNimmtBot.Models.Game
         public int TelegramId { get; set; }
         public string Name { get; set; }
         public string Username { get; set; }
+        public bool Virtual { get; set; } = false;
         public int Score { get; set; } = 0;
         public List<SNCard> CardsInHand = new List<SNCard>();
         public List<SNCard> KeptCards = new List<SNCard>();

@@ -219,7 +219,7 @@ namespace SixNimmtBot
                                 db.Games.Add(DbGame);
                                 db.SaveChanges();
                                 GameId = DbGame.Id;
-                                foreach (var p in Players)
+                                foreach (var p in Players.Where(x => !x.Virtual))
                                 {
                                     GamePlayer DbGamePlayer = new GamePlayer
                                     {
@@ -241,7 +241,7 @@ namespace SixNimmtBot
 
                             #region Start!
                             SendTableCards();
-                            foreach (var player in Players)
+                            foreach (var player in Players.Where(x => !x.Virtual))
                             {
                                 SendPM(player, $"{GetTranslation("CardsInHand")}\n{GetPlayerCards(player.CardsInHand)}");
                             }
@@ -357,6 +357,37 @@ namespace SixNimmtBot
             Send(GetTranslation("JoinedGame", u.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
         }
 
+        private void AddVirtualPlayer()
+        {
+            if (Players.Count >= Constants.MaxPlayer)
+                return;
+
+            var id = new Random().Next(888888888, 999999999);
+            var name = "";
+            do
+            {
+                name = $"{GetTranslation("VirtualPlayerPrefix")} {GetTranslation("VirtualPlayerName")}";
+            }
+            while (Players.Any(x => x.Name == name));
+
+            SNPlayer p = new SNPlayer
+            {
+                Name = name,
+                Id = id,
+                TelegramId = id,
+                Username = null,
+                UseSticker = false,
+                Virtual = true,
+            };
+            if (Players.Count >= Constants.MaxPlayer)
+                return;
+            this.Players.Add(p);
+
+            _secondsToAdd += 15;
+
+            Send(GetTranslation("JoinedGame", p.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
+        }
+
         private void RemovePlayer(User user)
         {
             if (this.Phase != GamePhase.Joining) return;
@@ -376,6 +407,19 @@ namespace SixNimmtBot
             while (true);
 
             Send(GetTranslation("FledGame", user.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
+        }
+
+        private void RemoveVirtualPlayer()
+        {
+            if (this.Phase != GamePhase.Joining) return;
+
+            var player = this.Players.FirstOrDefault(x => x.Virtual == true);
+            if (player == null)
+                return;
+
+            this.Players.Remove(player);
+            
+            Send(GetTranslation("FledGame", player.GetName()) + Environment.NewLine + GetTranslation("JoinInfo", Players.Count, Constants.MinPlayer, Constants.MaxPlayer));
         }
 
         public void CleanPlayers()
@@ -534,7 +578,7 @@ namespace SixNimmtBot
                     var playerMentions = Players.Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
                     firstMsg += Environment.NewLine + $"{GetTranslation("EveryoneChooseCard", ChooseCardTime.ToBold())}\n{playerMentions}";
                     var currentSticker = GetTableCardsImage(TableCards);
-                    foreach (var p in Players)
+                    foreach (var p in Players.Where(x => !x.Virtual))
                     {
                         if (p.UseSticker)
                         {
@@ -558,7 +602,7 @@ namespace SixNimmtBot
                     for (int i = 0; i < ChooseCardTime; i++)
                     {
                         Thread.Sleep(1000);
-                        if (Players.All(x => x.CurrentQuestion == null))
+                        if (Players.Where(x => !x.Virtual).All(x => x.CurrentQuestion == null))
                             break;
                         if (i == ChooseCardTime - 15)
                         {
@@ -573,7 +617,7 @@ namespace SixNimmtBot
 
                 Thread.Sleep(1000); // hopefully dont random late-voter
                 // check of afk
-                foreach (var p in Players)
+                foreach (var p in Players.Where(x => !x.Virtual))
                 {
                     if (p.CurrentQuestion != null)
                     {
@@ -585,7 +629,7 @@ namespace SixNimmtBot
                 }
 
                 // announce AFK
-                if (Players.Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
+                if (Players.Where(x => !x.Virtual).Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
                 {
                     Thread.Sleep(2000);
                     var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
@@ -600,6 +644,8 @@ namespace SixNimmtBot
                 foreach (var p in Players)
                 {
                     SNCard card;
+                    if (p.Virtual)
+                        VirtualPlayerChooseCard(p);
                     if (p.Choice != 0)
                     {
                         card = p.CardsInHand.FirstOrDefault(x => x.Number == p.Choice);
@@ -660,35 +706,46 @@ namespace SixNimmtBot
 
                         /* NEW: PLAYER CHOOSE WHICH ROW TO KEEP */
                         Send($"{msg}\n{GetTranslation("CardLowerThanAll", card.PlayedBy.GetMention(), ChooseCardTime.ToBold())}", BotMarkup);
-                        SendMenu(card.PlayedBy,
-                            TextToTable(TableCards) +
-                            Environment.NewLine + Environment.NewLine +
-                            GetTranslation("CardLowerThanAllPM", card.GetName()),
-                            GenerateMenu(card.PlayedBy, TableCards));
-                        for (int i = 0; i < ChooseCardTime; i++)
+                        if (!card.PlayedBy.Virtual)
                         {
-                            Thread.Sleep(1000);
-                            if (card.PlayedBy.CurrentQuestion == null)
-                                break;
-                        }
+                            SendMenu(card.PlayedBy,
+                              TextToTable(TableCards) +
+                              Environment.NewLine + Environment.NewLine +
+                              GetTranslation("CardLowerThanAllPM", card.GetName()),
+                              GenerateMenu(card.PlayedBy, TableCards));
 
-                        // Check AFK
-                        if (card.PlayedBy.CurrentQuestion != null)
-                        {
-                            card.PlayedBy.Choice = -1;
-                            Bot.Edit(card.PlayedBy.TelegramId, card.PlayedBy.CurrentQuestion.MessageId, GetTranslation("TimesUpButton"));
-                            card.PlayedBy.CurrentQuestion = null;
-                            card.PlayedBy.AFKTimes++;
-                        }
+                            for (int i = 0; i < ChooseCardTime; i++)
+                            {
+                                Thread.Sleep(1000);
+                                if (card.PlayedBy.CurrentQuestion == null)
+                                    break;
+                            }
 
-                        if (Players.Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
+
+                            // Check AFK
+                            if (card.PlayedBy.CurrentQuestion != null)
+                            {
+                                card.PlayedBy.Choice = -1;
+                                Bot.Edit(card.PlayedBy.TelegramId, card.PlayedBy.CurrentQuestion.MessageId, GetTranslation("TimesUpButton"));
+                                card.PlayedBy.CurrentQuestion = null;
+                                card.PlayedBy.AFKTimes++;
+                            }
+
+                            if (Players.Any(x => x.AFKTimes == 2 && x.AFKNotified != true))
+                            {
+                                Thread.Sleep(2000);
+                                var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
+                                Send(GetTranslation("AFK2Times", afkPlayers));
+                                foreach (var p in Players.Where(x => x.AFKTimes == 2))
+                                    p.AFKNotified = true;
+                                Thread.Sleep(2000);
+                            }
+                        }
+                        else
                         {
-                            Thread.Sleep(2000);
-                            var afkPlayers = Players.Where(x => x.AFKTimes == 2).Select(x => x.GetMention()).Aggregate((x, y) => x + ", " + y);
-                            Send(GetTranslation("AFK2Times", afkPlayers));
-                            foreach (var p in Players.Where(x => x.AFKTimes == 2))
-                                p.AFKNotified = true;
-                            Thread.Sleep(2000);
+                            Thread.Sleep(new Random().Next(1, 10) * 1000);
+                            var listOfSum = TableCards.Select(row => row.Where(c => c != null).Sum(c => c.Bulls)).ToList();
+                            card.PlayedBy.Choice = listOfSum.IndexOf(listOfSum.Min());
                         }
 
                         int rowChosenNum = 0;
@@ -774,6 +831,28 @@ namespace SixNimmtBot
                 Log(ex);
                 Phase = GamePhase.KillGame;
             }
+        }
+
+        public void VirtualPlayerChooseCard(SNPlayer p)
+        {
+            var min = -1;
+            var minc = 0;
+            foreach (var c in p.CardsInHand)
+            {
+                var temp = -1;
+                foreach (var row in TableCards.Select(x => x.Where(card => card != null)))
+                {
+                    var lastCard = row.Last();
+                    if (lastCard.Number < c.Number && (c.Number - lastCard.Number < temp || temp < 0))
+                        temp = c.Number - lastCard.Number;
+                }
+                if (temp < min || min < 0)
+                {
+                    min = temp;
+                    minc = c.Number;
+                }
+            }
+            p.Choice = minc;
         }
 
         public void PrepareGame()
@@ -885,7 +964,7 @@ namespace SixNimmtBot
             // DB
             using (var db = new SixNimmtDb())
             {
-                foreach (var p in Players)
+                foreach (var p in Players.Where(x => !x.Virtual))
                 {
                     var dbgp = db.GamePlayers.FirstOrDefault(x => x.GameId == GameId && x.PlayerId == p.Id);
                     dbgp.Bulls = p.FinalScore;
@@ -906,7 +985,7 @@ namespace SixNimmtBot
                 g.TimeEnded = DateTime.UtcNow;
                 db.SaveChanges();
 
-                foreach (var p in Players)
+                foreach (var p in Players.Where(x => !x.Virtual))
                 {
                     Achievements newAchv = Achievements.None;
                     var dbp = db.Players.FirstOrDefault(x => x.TelegramId == p.TelegramId);
@@ -1183,6 +1262,14 @@ namespace SixNimmtBot
                             msg.Reply(GetTranslation("KeptNoCards"));
                         */
                     }
+                    break;
+                case "addvp":
+                    if (Phase == GamePhase.Joining)
+                        AddVirtualPlayer();
+                    break;
+                case "remvp":
+                    if (Phase == GamePhase.Joining)
+                        RemoveVirtualPlayer();
                     break;
             }
 
