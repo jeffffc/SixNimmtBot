@@ -164,7 +164,7 @@ namespace SixNimmtBot
             }
         }
 
-        [Command(Trigger = "addvp", GroupOnly = true)]
+        [Command(Trigger = "addvp", GroupOnly = true, DevOnly = true)]
         public static void AddVirtualPlayer(Message msg, string[] args)
         {
             SixNimmt game = Bot.GetGameByChatId(msg.Chat.Id);
