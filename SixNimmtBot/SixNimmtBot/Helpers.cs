@@ -17,6 +17,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing;
 using System.Data;
+using SixNimmtBot.Models.Game;
 
 namespace SixNimmtBot
 {
@@ -103,6 +104,11 @@ namespace SixNimmtBot
                 UserName = user.Username,
                 Language = "English"
             };
+        }
+
+        public static List<SNCard> AllCards(this List<SNCard[]> deck)
+        {
+            return deck.SelectMany(c => c).Where(c => c != null).ToList();
         }
 
         public static Dictionary<string, Locale> ReadLanguageFiles()

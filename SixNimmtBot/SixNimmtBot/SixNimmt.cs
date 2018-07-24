@@ -835,6 +835,7 @@ namespace SixNimmtBot
 
         public void VirtualPlayerChooseCard(SNPlayer p)
         {
+            /*
             var min = -1;
             var minc = 0;
             foreach (var c in p.CardsInHand)
@@ -843,7 +844,7 @@ namespace SixNimmtBot
                 foreach (var row in TableCards.Select(x => x.Where(card => card != null)))
                 {
                     var lastCard = row.Last();
-                    if (lastCard.Number < c.Number && (c.Number - lastCard.Number < temp || temp < 0))
+                    if (row.Count() < 5 && lastCard.Number < c.Number && (c.Number - lastCard.Number < temp || temp < 0))
                         temp = c.Number - lastCard.Number;
                 }
                 if (temp < min || min < 0)
@@ -853,6 +854,128 @@ namespace SixNimmtBot
                 }
             }
             p.Choice = minc;
+            */
+            Dictionary<SNCard, VirtualPlayCardScore> scoreDict = new Dictionary<SNCard, VirtualPlayCardScore>();
+            if (VirtualPlayerCheckFirstCard(p))
+                p.Choice = p.CardsInHand.First().Number;
+            var interest = VirtualPlayerBuildInterest();
+            var costs = VirtualPlayerCountCosts();
+            foreach (var c in p.CardsInHand)
+            {
+                var colNum = VirtualPlayerFindCurrentIndex(c);
+                if (colNum != null)
+                {
+                    var indDiff = VirtualPlayerIndexDifference(interest, (int)colNum, c);
+                    scoreDict[c] = new VirtualPlayCardScore(VirtualPlayRanking.PlayNow, indDiff, -TableCards[(int)colNum].Length, -costs[(int)colNum], c.Number);
+
+                    if (VirtualPlayerCanPostpone((int)colNum, interest, p, c))
+                        scoreDict[c].Ranking = VirtualPlayRanking.PlayLater;
+
+                    if (new[] { scoreDict[c].IndexDiff, Players.Count }.Min() - scoreDict[c].NumInColumn > 5)
+                        scoreDict[c].Ranking = VirtualPlayRanking.PotentialTake;
+                }
+                else
+                {
+                    var interestWithoutHand = interest.Where(x => !p.CardsInHand.Contains(x)).Union(Enumerable.Repeat(c, 1)).OrderBy(x => x.Number).ToList();
+                    var diff = VirtualPlayerIndexDifference(interestWithoutHand, interestWithoutHand.First().Number, c);
+                    scoreDict[c] = new VirtualPlayCardScore(VirtualPlayRanking.ChooseColumn, -diff, c.Number);
+                }
+            }
+            if (scoreDict.All(x => x.Value.Ranking == VirtualPlayRanking.PotentialTake))
+                VirtualPlayerTryNotToTake();
+            p.Choice = scoreDict.OrderBy(x => (int)x.Value.Ranking).First().Key.Number;
+        }
+
+        public class VirtualPlayCardScore
+        {
+            public VirtualPlayCardScore(VirtualPlayRanking ranking, int indexDiff, int numInColumn, int cost = 0, int cardValue = 0)
+            {
+                Ranking = ranking;
+                IndexDiff = indexDiff;
+                NumInColumn = numInColumn;
+                Cost = cost;
+                CardValue = cardValue;
+            }
+
+            public VirtualPlayRanking Ranking { get; set; }
+            public int IndexDiff { get; set; }
+            public int NumInColumn { get; set; }
+            public int Cost { get; set; }
+            public int CardValue { get; set; }
+        }
+
+        public enum VirtualPlayRanking
+        {
+            PlayNow = 1,
+            PlayLater = 2,
+            ChooseColumn = 3,
+            PotentialTake = 4,
+        }
+
+        public bool VirtualPlayerCheckFirstCard(SNPlayer p, int threshold = 2)
+        {
+            var opp = CardDeck.Cards.Where(x => x.PlayedBy == null && !TableCards.AllCards().Contains(x) && !p.CardsInHand.Contains(x)).ToList().OrderBy(x => x.Number);
+            if (opp.First().Number < p.CardsInHand.First().Number || TableCards.First().Where(x => x != null).Last().Number < p.CardsInHand.First().Number)
+                return false;
+            return TableCards.Any(row => row.Where(x => x != null).Select(x => x.Bulls).Sum() < threshold);
+        }
+
+        public List<SNCard> VirtualPlayerBuildInterest()
+        {
+            return CardDeck.Cards.ToList().Where(x => TableCards.AllCards().Contains(x) && x.PlayedBy != null).Union(TableCards.Select(row => row.Where(card => card != null).Last())).ToList();
+        }
+
+        public List<int> VirtualPlayerCountCosts()
+        {
+            return TableCards.Select(row => row.Where(card => card != null).Sum(x => x.Bulls)).ToList();
+        }
+
+        public int? VirtualPlayerFindCurrentIndex(SNCard c)
+        {
+            var i = 0;
+            while (i < 3 && c.Number > TableCards[i + 1].Where(x => x != null).Last().Number)
+                i += 1;
+            if (i == 0 && c.Number < TableCards[0].Where(x => x != null).Last().Number)
+                return null;
+            return i;
+        }
+
+        public int VirtualPlayerIndexDifference(List<SNCard> interests, int colNum, SNCard c)
+        {
+            return interests.IndexOf(c) - interests.IndexOf(TableCards[colNum].Where(x => x != null).Last());
+        }
+
+        public bool VirtualPlayerCanPostpone(int colIndex, List<SNCard> interest, SNPlayer p, SNCard c)
+        {
+            var interestWithoutHand = interest.Where(x => !p.CardsInHand.Contains(x)).Union(Enumerable.Repeat(c, 1)).OrderBy(x => x.Number);
+            if (c != interestWithoutHand.Last())
+                return false;
+
+            var costs = VirtualPlayerCountCosts();
+            return costs.Any(x => x < costs[colIndex]);
+        }
+
+        public int VirtualPlayerTryNotToTake(SNPlayer p)
+        {
+            /*
+            def try_not_to_take(self):
+                # Another score_dict cost function
+                score_dict = {}
+                s_interest = self.build_set_of_interest() - set(self.hand)
+                col_costs = [countHeads(col) for col in self.table]
+                for card in self.hand:
+                    index = self.find_col_index(card)
+                    l_interest = sorted(s_interest | set([card]))
+                    dif = index_difference(l_interest, self.max_cols[index], card)
+                    # Try to find a card which is higher than the card of an opponent
+                    if dif > 1: # 1 can be changed
+                        score_dict[card] = [Card.MAX_DIFF, -dif, card]
+                    # If not, try to take a column with the minimum number of cows
+                    else:
+                        score_dict[card] = [Card.MIN_COWS, col_costs[index], card]
+                return min(score_dict, key=score_dict.get)
+            */
+            return 0;
         }
 
         public void PrepareGame()
