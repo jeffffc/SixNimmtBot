@@ -835,6 +835,7 @@ namespace SixNimmtBot
 
         public void VirtualPlayerChooseCard(SNPlayer p)
         {
+            /*
             var min = -1;
             var minc = 0;
             foreach (var c in p.CardsInHand)
@@ -853,6 +854,115 @@ namespace SixNimmtBot
                 }
             }
             p.Choice = minc;
+            */
+        }
+
+        public int? VirtualPlayerSelCard(SNPlayer p, bool max = false, bool smallerThan = false, int? value = null)
+        {
+            var valid = new List<int>();
+            if (!smallerThan)
+                valid = p.CardsInHand.Where(x => x.Number > (int)value).Select(x => x.Number).ToList();
+            else
+                valid = p.CardsInHand.Where(x => x.Number < (int)value).Select(x => x.Number).ToList();
+
+            if (valid.Count == 0)
+                return null;
+
+            if (!max)
+                return valid.Min();
+            else
+                return valid.Max();
+        }
+
+        public void VirtualPlayerAnalyzeCardChoice(SNPlayer p)
+        {
+            var pick = VirtualPlayerEvalDangerousRows(p);
+            if (pick == null)
+            {
+                p.Choice = VirtualPlayerSelCard(p, false, false, 0);
+            }
+            else if (pick > 0)
+                p.Choice = pick;
+            else if (pick < 0)
+            {
+                pick = VirtualPlayerEvalRowsLenDiff(p);
+                if (pick > 0)
+                    p.Choice = pick;
+                else
+                {
+                    pick = VirtualPlayerLargetSecondMin(p);
+                    if (pick > 0)
+                        p.Choice = pick;
+                    else
+                    {
+                        pick = VirtualPlayerLargerMinimum(p);
+                        if (pick > 0)
+                            p.Choice = pick;
+                        else
+                            p.Choice = p.CardsInHand.Min(x => x.Number);
+                    }
+                }
+            }
+        }
+
+        public int? VirtualPlayerEvalDangerousRows(SNPlayer p)
+        {
+            var dangerCards = new List<int>();
+            foreach (var row in TableCards)
+            {
+                var cards = row.Where(x => x != null).OrderBy(x => x.Number);
+                if (cards.Count() == 5)
+                    dangerCards.Add(row.Last().Number);
+            }
+            if (dangerCards.Count == 0)
+                return -1;
+            else
+                return VirtualPlayerSelCard(p, true, true, dangerCards.Min());
+        }
+
+        public int? VirtualPlayerGetExtremeValue(bool max = false, int length = 0)
+        {
+            var val = new List<int>();
+            foreach (var row in TableCards)
+            {
+                var cards = row.Where(x => x != null).OrderBy(x => x.Number);
+                if (cards.Count() == length)
+                    val.Add(cards.Last().Number);
+            }
+            if (!max)
+                return val.Min();
+            else
+                return val.Max();
+        }
+
+        public int? VirtualPlayerEvalRowsLenDiff(SNPlayer p)
+        {
+            var rowLen = TableCards.Select(x => x.Where(y => y != null).Count());
+            var min = rowLen.Min();
+            var max = rowLen.Max();
+            if ((max - min) >= 3)
+            {
+                var longVal = VirtualPlayerGetExtremeValue(false, max);
+                var shortVal = VirtualPlayerGetExtremeValue(true, min);
+                if (longVal > shortVal)
+                    return VirtualPlayerSelCard(p, true, true, longVal);
+                else
+                    return VirtualPlayerSelCard(p, false, false, shortVal);
+            }
+            else
+                return -1;
+        }
+
+        public int? VirtualPlayerLargetSecondMin(SNPlayer p)
+        {
+            var cards = TableCards.Select(x => x.Where(c => c != null).Last().Number).OrderBy(x => x);
+            return VirtualPlayerSelCard(p, false, false, cards.ElementAt(1));
+        }
+
+        public int? VirtualPlayerLargerMinimum(SNPlayer p)
+        {
+            var cards = TableCards.Select(x => x.Where(c => c != null).Last().Number).OrderBy(x => x);
+            return VirtualPlayerSelCard(p, false, false, cards.First());
         }
 
         public void PrepareGame()
