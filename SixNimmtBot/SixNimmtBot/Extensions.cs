@@ -76,6 +76,7 @@ namespace SixNimmtBot
                 m += trace;
 
             Bot.Send(Constants.LogGroupId, m, parseMode: ParseMode.Default);
+            Bot.Send(Constants.LogGroupId, e.ToString(), parseMode: ParseMode.Default);
         }
 
         // Player Extensions
