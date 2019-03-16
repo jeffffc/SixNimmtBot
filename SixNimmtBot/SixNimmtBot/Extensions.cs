@@ -56,14 +56,15 @@ namespace SixNimmtBot
 
         public static void LogError(this Exception e, long? chatId = null, long? userId = null, bool noStackTrace = false)
         {
+            if (e.Message.ToLower().Contains("request timed out")) return;
+            
+            string exceptionString = e.ToString();
             string m = "Error occured." + Environment.NewLine;
             if (chatId != null)
                 m += $"ChatId: {chatId}" + Environment.NewLine + Environment.NewLine;
             if (userId != null)
                 m += $"UserId: {userId}" + Environment.NewLine + Environment.NewLine;
             var trace = e.StackTrace;
-
-            if (e.Message.ToLower().Contains("request timed out")) return;
 
             do
             {
@@ -76,7 +77,7 @@ namespace SixNimmtBot
                 m += trace;
 
             Bot.Send(Constants.LogGroupId, m, parseMode: ParseMode.Default);
-            Bot.Send(Constants.LogGroupId, e.ToString(), parseMode: ParseMode.Default);
+            Bot.Send(Constants.LogGroupId, exceptionString, parseMode: ParseMode.Default);
         }
 
         // Player Extensions
